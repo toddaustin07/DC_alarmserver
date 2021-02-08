@@ -21,6 +21,6 @@ Run this script using one argument as full pathname of your alarmserver.cfg file
 1) Creation of SmartThings custom capabilities: this can be done through the CLI tool or through the API with tools like Postman; all json is provided in this package
 - note: This task will hopefully be greatly simplified if/when custom capabilities can be shared; or when further automation tools for these steps are added to this package
 2) Creation of SmartThings device profiles in the Developer Workspace: ONE for each device TYPE needed (types=panel, contact, motion, smoke, co2)
-3) Download and copy onboarding_config.json files into applicable zone device directories
+3) Download onboarding_config.json files into applicable zone device directories
 4) Initial onboarding/provisioning of each zone device + panel device using mobile app
 
