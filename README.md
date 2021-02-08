@@ -3,7 +3,7 @@
 This repository contains files to implement alarmserver on a Raspberry Pi with device applications using SmartThings direct-connected device API.  A device application will be instantiated for each DSC zone, plus a device application representing the DSC Panel.  Whereas in legacy SmartThings implementations, a separate Stay and Away panel was needed for automation linkage with SmartThings Home Monitor, here only one panel is needed.
 
 Zones device apps can optionally display a GUI window on the Raspbery Pi desktop (one for each zone).  Alternatively they can be run in background with logfiles.
-The panel application, in addition to handling the device interface to SmartThings, will also display a full DSC panel GUI window on the Pi desktop for local monitoring and control of the alarm system.
+The panel application, in addition to handling the panel device interface to SmartThings, will also display a full DSC panel GUI window on the Pi desktop for local monitoring and control of the alarm system.
 
 ## Pre-requisites
 -Direct-connect enablement github package for Raspberry Pi (rpi-st-device): https://toddaustin07.github.io/
