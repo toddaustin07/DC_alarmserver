@@ -26,9 +26,9 @@ Run this script once everything is configured & installed: ASdevsetup is complet
 This script will automate the creation of QR codes for each device and ensure everything is prepared for initial provisioning of all device apps (zone + panel)
 
 ### Additional scripts
-startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver
-buildloader - used by ASdevsetup; creates loaddevs script that loads/starts each device app (zones + panel)
-STdevsn - list serial numbers associated with each device app
+- startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver
+- buildloader - used by ASdevsetup; creates loaddevs script that loads/starts each device app (zones + panel)
+- STdevsn - list serial numbers associated with each device app
 
 
 ## Manual Setup Tasks
