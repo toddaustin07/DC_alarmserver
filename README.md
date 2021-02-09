@@ -47,9 +47,9 @@ Device Profile
   Name                         DSC_Panel              DSC_Contact             DSC_Motion     
   Version                      0.1                    0.1                     0.1
   Device Type                  Switch                 ContactSensor           MotionSensor
-  Components & Capabilities    Health Check (opt)     Health Check (opt)      Health Check (opt)
+  Components & Capabilities*   Health Check (opt)     Health Check (opt)      Health Check (opt)
                                partitionStatus        contactStatus           motionStatus
-                               partitionCommand       zoneBypass              zoneBypass
+                               partitioncommand       zoneBypass              zonebypass
                                dscdashswitch
                                dscstayswitch
                                dscawayswitch
@@ -70,7 +70,8 @@ Product Info
 
 ```
 
-* Upload the json file provided for the device type:  deviceConfigST_panel.json, deviceConfigST_contact.json, deviceConfigST_motion.json
+* These are custom capabilities (except Health Check); if/when we can specify custom capabilities from other accounts, my prefix is 'partyvoice23922'
+** Upload the device configuration json file provided in this repository for the applicable device type:  deviceConfigST_panel.json, deviceConfigST_contact.json, deviceConfigST_motion.json
 
 When complete with the above, onboarding_config.json files must be downloaded and placed in each of the appropriate device directories (one json file per device type)
 
