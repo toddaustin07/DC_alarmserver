@@ -12,15 +12,36 @@ The panel application, in addition to handling the panel device interface to Sma
 ## Pre-requisites
 - Direct-connect enablement github package for Raspberry Pi (rpi-st-device): https://toddaustin07.github.io/
 - Installed and configured alarmserver package: https://github.com/rtorchia/DSC-Envisalink/tree/master/alarmserver
+- SmartThings CLI:  https://github.com/SmartThingsCommunity/smartthings-cli/tree/master/packages/cli
+- SmartThings personal token: https://smartthings.developer.samsung.com/docs/auth-and-permissions.html
 
-## Automated Setup Tool
+## Automated Setup Tools
+
 ### ASdevsetup
 Run this script using one argument as full pathname of your alarmserver.cfg file.  It will read your alarmserver.cfg file to get the defined zones and will then automate creation of device serial numbers and set up each zone device subdirectory with required files.  Note: this script depends on prior install and setup completion of rpi-st-device package.
 
+### Device Onboarding Helper (wip)
+Run this script once everything is configured & installed: ASdevsetup is complete, device projects are defined in Developer Workspace, and onboarding_config.json files have been downloaded.
+This script will automate the creation of QR codes for each device and ensure everything is prepared for initial provisioning of all device apps (zone + panel)
+
+### Additional scripts
+startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver
+buildloader - used by ASdevsetup; creates loaddevs script that loads/starts each device app (zones + panel)
+STdevsn - list serial numbers associated with each device app
+
+
 ## Manual Setup Tasks
-1) Creation of SmartThings custom capabilities: this can be done through the CLI tool or through the API with tools like Postman; all json is provided in this package
-- note: This task will hopefully be greatly simplified if/when custom capabilities can be shared; or when further automation tools for these steps are added to this package
+
+### Create SmartThings custom capabilities 
+This will be done through either the CLI tool or via API with tools like Postman; all json is provided in this package.
+This step can be eliminated if the Developer Workspace allowed using custom capabilities outside your own account.  At this time I don't think it does, but this requires confirmation.
+
+
+### Create SmartThings device profiles
+This is done in the Developer Workspace.  One project/device profile must created for each TYPE of device you are using (panel, contact, motion, smoke, co2)
+
 2) Creation of SmartThings device profiles in the Developer Workspace: ONE for each device TYPE needed (types=panel, contact, motion, smoke, co2)
 3) Download onboarding_config.json files into applicable zone device directories
 4) Initial onboarding/provisioning of each zone device + panel device using mobile app
 
+##
