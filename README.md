@@ -19,7 +19,7 @@ The panel application, in addition to handling the panel device interface to Sma
 ## Automated Setup Tools
 
 ### ASdevsetup
-Run this script using one argument as full pathname of your alarmserver.cfg file.  It will read your alarmserver.cfg file to get the defined zones and will then automate creation of device serial numbers and set up each zone device subdirectory with required files.  Note: this script depends on prior install and setup completion of rpi-st-device package.
+Run this script using one argument as full pathname of your alarmserver.cfg file.  It will read your alarmserver.cfg file to get the defined zones and will then automate creation of device serial numbers and set up each zone device subdirectory with required files.  Note: this script depends on prior install and setup completion of rpi-st-device package, which configures your Pi to successfully onboard and run ST direct-connnected device apps.
 
 ### Device Onboarding Helper (wip)
 Run this script once everything is configured & installed: ASdevsetup is complete, device projects are defined in Developer Workspace, and onboarding_config.json files have been downloaded.
