@@ -49,7 +49,7 @@ Device Profile
   Device Type                  Switch                 ContactSensor           MotionSensor
   Components & Capabilities*   Health Check (opt)     Health Check (opt)      Health Check (opt)
                                partitionStatus        contactStatus           motionStatus
-                               partitioncommand       zoneBypass              zonebypass
+                               partitioncommand       zonebypass              zonebypass
                                dscdashswitch
                                dscstayswitch
                                dscawayswitch
@@ -71,15 +71,22 @@ Product Info
   UI Display*                         << 'Customize through device configuration file' >>
 
 ```
+#### Components & Capabilities
+All are defined under 'main' component.  All capabilities besides 'Health Check' are custom that you built in prior step. Filter the capability list for 'My Capabilities', and you should see all the ones you have created.  Select the corresponding capabilities listed in the table above.
 
-* These are custom capabilities (except Health Check); if/when we can specify custom capabilities from other accounts, my prefix is 'partyvoice23922'
-** Upload the device configuration json file provided in this repository for the applicable device type:  deviceConfigST_panel.json, deviceConfigST_contact.json, deviceConfigST_motion.json
+#### UI Display
+You will choose the option to upload the device configuration json file provided in this repository for the applicable device type:  deviceConfigST_panel.json, deviceConfigST_contact.json, deviceConfigST_motion.json
 
+### Download onboarding_config.json files
 When complete with the above, onboarding_config.json files must be downloaded and placed in each of the appropriate device directories (one json file per device type)
 
 
-2) Creation of SmartThings device profiles in the Developer Workspace: ONE for each device TYPE needed (types=panel, contact, motion, smoke, co2)
-3) Download onboarding_config.json files into applicable zone device directories
-4) Initial onboarding/provisioning of each zone device + panel device using mobile app
+### Initial onboarding/provisioning of each zone device + panel device using mobile app
+You will use your mobile phone to connect with each of the running zone & panel device apps on your Raspberry Pi and complete onboarding. 
 
-##
+
+### Operational Specifics:
+
+Alarmserver is re-configured to send/receive via tcp sockets to a locally running process on your Pi (DSCmanager), rather than to SmartThings.  DSCmanager then acts as traffic manager to forward messages to the appropriate zone/panel device app.  The device apps are connected to SmartThings via the direct-connect API using the ST core SDK.  Messages from SmartThings (commands and state changes) are received directly by the respective device app, which in turn routes commands back down to alarmserver via DSCmanager.  UNIX named sockets are used for all IPC between DSCmanager and device apps.
+
+Loading of device apps is initiated by DSCmanager through a bash script so that user's can modify it for preference of running apps in foreground vs. background, piping output to logfiles, GUI selection, etc.
