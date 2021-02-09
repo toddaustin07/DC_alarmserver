@@ -35,7 +35,7 @@ This script will automate the creation of QR codes for each device and ensure ev
 
 ### Create SmartThings custom capabilities 
 This will be done through either the CLI tool or via API with tools like Postman; all json is provided in this package.
-This step can be eliminated if the Developer Workspace allowed using custom capabilities outside your own account.  At this time I don't think it does, but this requires confirmation.
+This step can be eliminated if the Developer Workspace allowed using custom capabilities outside your own account.  At this time it doesn't, so I continuing to look for ways to simplify this task.  I'm looking and writing a script that will automate much of this using the API, so watch for updates.
 
 ### Create SmartThings device profiles
 This is done in the Developer Workspace.  One project/device profile must be created for each TYPE of device you are using (panel, contact, motion, smoke, co2)
