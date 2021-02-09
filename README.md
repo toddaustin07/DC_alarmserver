@@ -54,11 +54,13 @@ Device Profile
                                dscstayswitch
                                dscawayswitch
                                dscselectswitch
+
 Onboarding
   Onboarding name                               <<  DSC Zone Device >>
   Authentication type                                << ED25519 >>
   Setup ID                                              << 02 >>
   Instructions                                  << whatever you'd like >>
+
 Product Info
   Category                                           << WiFi/Hub >>
   Availability                                 << United States (or other) >>
