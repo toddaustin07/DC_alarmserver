@@ -20,6 +20,9 @@ The panel application, in addition to handling the panel device interface to Sma
 ### ASdevsetup
 Run this script using one argument == full pathname of your alarmserver.cfg file.  It will read your alarmserver.cfg file to get the defined zones and will then automate creation of device serial numbers and set up each zone device subdirectory with required files.  Note: this script depends on prior install and setup completion of rpi-st-device package, which configures your Pi to successfully onboard and run ST direct-connnected device apps.
 
+### makecapabilities.py: auto creation of SmartThings custom capabilities 
+A python script is provided in the json/capabilities directory that will create all custom capabilities and presentations under your account.  First edit the makecapabilities.py script with your SmartThings personal token and then run it within the json directory.  It will iterate through the provided json files to create 10 custom capabilities along with their presentations via the SmartThings API.  Returned json strings are written to file for each capability.  Note your assigned capability id prefix.
+
 ### Device Onboarding Helper (wip)
 Run this script once everything is configured & installed, i.e. ASdevsetup is complete, device projects are defined in Developer Workspace, and onboarding_config.json files have been downloaded.
 This script will automate the creation of QR codes for each device and ensure everything is prepared for initial provisioning of all device apps (zone + panel)
@@ -31,9 +34,6 @@ This script will automate the creation of QR codes for each device and ensure ev
 
 
 ## Manual Setup Tasks
-
-### Create SmartThings custom capabilities 
-A python script is provided in the json/capabilities directory that will create all custom capabilities and presentations under your account.  First edit the makecapabilities.py script with your SmartThings personal token and then run it within the json directory.  It will iterate through the provided json files to create 10 custom capabilities along with their presentations via the SmartThings API.  Returned json strings are written to file for each capability.  Note your assigned capability id prefix.
 
 ### Create SmartThings device profiles
 This is done in the Developer Workspace.  One project/device profile must be created for each TYPE of device you are using (panel, contact, motion, smoke, CO2)
