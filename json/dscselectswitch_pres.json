@@ -1,0 +1,31 @@
+{
+    "dashboard": {
+        "states": [],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Configure dashboard arm type",
+            "displayType": "switch",
+            "switch": {
+                "command": {
+                    "name": "setSwitch",
+                    "on": "on",
+                    "off": "off"
+                },
+                "state": {
+                    "value": "switch.value",
+                    "on": "type: Arm AWAY",
+                    "off": "type: Arm STAY"
+                }
+            }
+        }
+    ],
+    "automation": {
+        "conditions": [],
+        "actions": []
+    },
+    "id": "xxxxxxxxxxxxxxx.dscselectswitch",
+    "version": 1
+}

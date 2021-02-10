@@ -1,0 +1,97 @@
+{
+    "dashboard": {
+        "states": [
+            {
+                "label": "{{partStatus.value}}",
+                "alternatives": [
+                    {
+                        "key": "Armed-away",
+                        "value": "Armed-away",
+                        "type": "active"
+                    },
+                    {
+                        "key": "Arming away",
+                        "value": "Arming away",
+                        "type": "active"
+                    },
+                    {
+                        "key": "Armed-stay",
+                        "value": "Armed-stay",
+                        "type": "active"
+                    },
+                    {
+                        "key": "Arming stay",
+                        "value": "Arming stay",
+                        "type": "active"
+                    },
+                    {
+                        "key": "Exit delay",
+                        "value": "Exit delay",
+                        "type": "active"
+                    },
+                    {
+                        "key": "Ready",
+                        "value": "Ready",
+                        "type": "inactive"
+                    },
+                    {
+                        "key": "Disarmed",
+                        "value": "Disarmed",
+                        "type": "active"
+                    },
+                    {
+                        "key": "Disarming",
+                        "value": "Disarming",
+                        "type": "active"
+                    },
+                    {
+                        "key": "ALARM!!",
+                        "value": "ALARM!!",
+                        "type": "active"
+                    }
+                ]
+            }
+        ],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Partition Status",
+            "displayType": "state",
+            "state": {
+                "label": "{{partStatus.value}}"
+            }
+        }
+    ],
+    "automation": {
+        "conditions": [
+            {
+                "label": "Partition Status",
+                "displayType": "list",
+                "list": {
+                    "alternatives": [
+                        {
+                            "key": "partStatus",
+                            "value": "Arm-Away",
+                            "type": "active"
+                        },
+                        {
+                            "key": "partStatus",
+                            "value": "Arm-Stay",
+                            "type": "active"
+                        },
+                        {
+                            "key": "partStatus",
+                            "value": "Ready",
+                            "type": "active"
+                        }
+                    ]
+                }
+            }
+        ],
+        "actions": []
+    },
+    "id": "xxxxxxxxxxxxxxx.partitionStatus",
+    "version": 1
+}

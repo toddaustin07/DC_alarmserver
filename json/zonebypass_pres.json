@@ -1,0 +1,70 @@
+{
+    "dashboard": {
+        "states": [],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Zone Bypass Toggle",
+            "displayType": "toggleSwitch",
+            "toggleSwitch": {
+                "command": {
+                    "name": "setZoneBypass",
+                    "on": "Bypass on",
+                    "off": "Bypass off"
+                },
+                "state": {
+                    "value": "zoneBypass.value",
+                    "on": "Bypassed",
+                    "off": "Not bypassed"
+                }
+            }
+        }
+    ],
+    "automation": {
+        "conditions": [
+            {
+                "label": "Zone Bypass Status",
+                "displayType": "list",
+                "list": {
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "Bypassed",
+                            "type": "active"
+                        },
+                        {
+                            "key": "off",
+                            "value": "Not bypassed",
+                            "type": "inactive"
+                        }
+                    ]
+                }
+            }
+        ],
+        "actions": [
+            {
+                "label": "Zone Bypass Status",
+                "displayType": "list",
+                "list": {
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "Bypass on",
+                            "type": "active"
+                        },
+                        {
+                            "key": "off",
+                            "value": "Bypass off",
+                            "type": "inactive"
+                        }
+                    ],
+                    "command": "setZoneBypass"
+                }
+            }
+        ]
+    },
+    "id": "xxxxxxxxxxxxxxx.zonebypass",
+    "version": 1
+}

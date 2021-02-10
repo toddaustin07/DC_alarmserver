@@ -1,0 +1,37 @@
+{
+    "name": "motionStatus",
+    "attributes": {
+        "motionStatus": {
+            "schema": {
+                "type": "object",
+                "properties": {
+                    "value": {
+                        "type": "string",
+                        "maxLength": 16
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "value"
+                ]
+            },
+            "setter": "setMotionStatus",
+            "enumCommands": []
+        }
+    },
+    "commands": {
+        "setMotionStatus": {
+            "name": "setMotionStatus",
+            "arguments": [
+                {
+                    "name": "value",
+                    "optional": false,
+                    "schema": {
+                        "type": "string",
+                        "maxLength": 16
+                    }
+                }
+            ]
+        }
+    }
+}

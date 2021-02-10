@@ -1,0 +1,70 @@
+{
+    "dashboard": {
+        "states": [],
+        "actions": [],
+        "basicPlus": []
+    },
+    "detailView": [
+        {
+            "label": "Arm Stay",
+            "displayType": "toggleSwitch",
+            "toggleSwitch": {
+                "command": {
+                    "name": "setSwitch",
+                    "on": "on",
+                    "off": "off"
+                },
+                "state": {
+                    "value": "switch.value",
+                    "on": "on",
+                    "off": "off"
+                }
+            }
+        }
+    ],
+    "automation": {
+        "conditions": [
+            {
+                "label": "Arm Stay",
+                "displayType": "list",
+                "list": {
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on",
+                            "type": "active"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off",
+                            "type": "inactive"
+                        }
+                    ]
+                }
+            }
+        ],
+        "actions": [
+            {
+                "label": "Arm Stay",
+                "displayType": "list",
+                "list": {
+                    "alternatives": [
+                        {
+                            "key": "on",
+                            "value": "on",
+                            "type": "active"
+                        },
+                        {
+                            "key": "off",
+                            "value": "off",
+                            "type": "inactive"
+                        }
+                    ],
+                    "command": "setSwitch"
+                }
+            }
+        ]
+    },
+    "id": "xxxxxxxxxxxxxxx.dscstayswitch",
+    "version": 1
+}
