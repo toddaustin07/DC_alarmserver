@@ -20,7 +20,7 @@ The panel device app, in addition to handling the panel device interface to Smar
 ### ASdevsetup
 Run this script using one argument that is the full pathname of your alarmserver.cfg file.  The script will read your alarmserver.cfg file to get your defined zones, set up device subdirectories, create device serial numbers, initialize a device loader script (loaddevs), and modify alarmserver.cfg.  Upon successful completion, a file called 'serialnums' will be created that contains a sorted list of the created device serial numbers that you can use to copy and paste into the Developer Workspace device profiles later on. 
 
-Note: this script depends on prior install and setup of rpi-st-device package, which configures your Pi to successfully onboard and run ST direct-connnected device apps.
+Note: this script depends on the core SDK repository tool 'stdk-keygen', so prior installation via my rpi-st-devices package is required.
 
 ### STcapabilities.py: auto creation/update/delete of SmartThings custom capabilities 
 A python script is provided in the json/capabilities directory that will create all custom capabilities and presentations under your account.  First edit the STcapabilities.py script with your SmartThings personal token and then run it with the argument of 'create' within the json directory.  It will iterate through the capability json files (provided in 'base' subdirectory) to create 10 custom capabilities along with their presentations via the SmartThings API.  Returned json strings are written to file for each capability in the 'created' subdirectory.  Note your assigned capability id prefix.  You can also use this tool to update the capabilities and presentations by modifying the files in the 'created' subdirectory and running STcapabilities.py with the 'update' argument.  Finally, Using a 'delete' argument, this tool will delete all capabilities and presentations as contained in the 'created' directory. (For now, it does not delete the local json files in the 'created' subdirectory - just in case you wanted to archive them!)
@@ -29,9 +29,12 @@ A python script is provided in the json/capabilities directory that will create 
 Run this script once everything is configured & installed, i.e. ASdevsetup is complete, device projects are defined in Developer Workspace, and onboarding_config.json files have been downloaded to the device subdirectories.
 This script will automate the creation of QR codes for each device (used by mobile app during initial device onboarding) and ensure everything is prepared for initial provisioning of all device apps (zone + panel)
 
+Note: this script depends on the core SDK repository tool 'stdk-qrgen', so prior installation via my rpi-st-devices package is required.
+
 ### Additional scripts
 - startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver; this is optional- you can configure loading anyway you like, e.g. auto-load at boot time through systemd, etc
 - buildloader - used by ASdevsetup; creates loaddevs script that is used by DSCmanager to start up each device app (zones + panel)
+- loaddevs - used by DSCmanager to load all device apps at startup 
 - STdevsn - list serial numbers associated with each device app
 
 
