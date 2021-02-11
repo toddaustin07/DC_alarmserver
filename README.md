@@ -18,7 +18,7 @@ The panel device app, in addition to handling the panel device interface to Smar
 ## Automated Setup Tools
 
 ### ASdevsetup
-Run this script using one argument that is the full pathname of your alarmserver.cfg file.  The script will read your alarmserver.cfg file to get your defined zones, set up device subdirectories, create device serial numbers, and initialize the device loading script, and modify alarmserver.cfg.  Upon successful completion, a file called 'serialnums' will be created that contains a sorted list of the created device serial numbers that you can use to copy and paste into the Developer Workspace device profiles later on. 
+Run this script using one argument that is the full pathname of your alarmserver.cfg file.  The script will read your alarmserver.cfg file to get your defined zones, set up device subdirectories, create device serial numbers, initialize a device loader script (loaddevs), and modify alarmserver.cfg.  Upon successful completion, a file called 'serialnums' will be created that contains a sorted list of the created device serial numbers that you can use to copy and paste into the Developer Workspace device profiles later on. 
 
 Note: this script depends on prior install and setup of rpi-st-device package, which configures your Pi to successfully onboard and run ST direct-connnected device apps.
 
