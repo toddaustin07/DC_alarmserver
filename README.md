@@ -115,7 +115,7 @@ Alarmserver is a program that will interface with an EyezOn Envisalink board tha
 For those new to alarmserver itself, please ask for assistance in the SmartThings Community topic for alarmserver.
 
 #### Tips
-### Ensure your /etc/hosts file contains an entrys such as:
+### Ensure your /etc/hosts file contains these entries:
 ```
 127.0.0.1       localhost
 127.0.1.1       raspberrypi
