@@ -12,7 +12,7 @@ The panel device app, in addition to handling the panel device interface to Smar
 
 ## Pre-requisites
 - Installed, configured, and running Direct-connect enablement package for Raspberry Pi (rpi-st-device): https://toddaustin07.github.io/
-- Installed, configured, and running alarmserver package: https://github.com/rtorchia/DSC-Envisalink/tree/master/alarmserver
+- Installed and configured alarmserver package: https://github.com/rtorchia/DSC-Envisalink/tree/master/alarmserver
 - SmartThings personal token: https://smartthings.developer.samsung.com/docs/auth-and-permissions.html
 
 ## Automated Setup Tools
