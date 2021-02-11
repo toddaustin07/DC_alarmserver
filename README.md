@@ -113,9 +113,11 @@ Loading of device apps is initiated by DSCmanager through a bash script so that 
 Alarmserver is a program that will interface with an EyezOn Envisalink board that is wired to your DSC alarm board.  Alarmserver provides an HTTP interface to/from the Envisalink via Ethernet so you can control, and get status from, your DSC alarm system.  It was originally implemented to integrate with SmartThings via the graph URL, but that option may be going away sometime in 2021 or 2022 as SmartThings evolves it's platform.  Ideally, you already have Alarmserver working in this original configuration, so that you've already configured your zones and have it successfully talking to the Envisalink and your DSC alarm system.  
 
 For those new to alarmserver itself, please ask for assistance in the SmartThings Community topic for alarmserver.
-Tip:  ensure your /etc/hosts file contains an entrys such as:
-'''
+
+#### Tips
+### Ensure your /etc/hosts file contains an entrys such as:
+```
 127.0.0.1       localhost
 127.0.1.1       raspberrypi
 192.168.1.100   EnvisaLink
-'''
+```
