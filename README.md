@@ -59,19 +59,19 @@ Device Profile
                                dscselectswitch
 
 Onboarding
-  Onboarding name                               <<  DSC Zone Device >>
-  Authentication type                                << ED25519 >>
-  Setup ID                                              << 02 >>
-  Instructions                                  << whatever you'd like >>
+  Onboarding name                                            <<  DSC Zone Device >>
+  Authentication type                                           << ED25519 >>
+  Setup ID                                                        << 02 >>
+  Instructions                                              << whatever you'd like >>
 
 Product Info
-  Category                                           << WiFi/Hub >>
-  Availability                                 << United States (or other) >>
-  Model Number / SKU           DSC_PANEL001           DSC_CONTACT001           DSC_MOTION001
+  Category                                                      << WiFi/Hub >>
+  Availability                                         << United States (or other) >>
+  Model Number / SKU           DSC_PANEL001           DSC_CONTACT001           DSC_MOTION001           DSC_SMOKE001            DSC_CO2001
 
  
   
-  UI Display*                         << 'Customize through device configuration file' >>
+  UI Display*                                    << 'Customize through device configuration file' >>
 
 ```
 #### Components & Capabilities
