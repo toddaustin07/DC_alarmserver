@@ -119,5 +119,5 @@ For those new to alarmserver itself, please ask for assistance in the SmartThing
 ```
 127.0.0.1       localhost
 127.0.1.1       raspberrypi
-192.168.1.100   EnvisaLink
+192.168.1.100   EnvisaLink      <<< or whatever IP address you are using
 ```
