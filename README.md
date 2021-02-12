@@ -44,16 +44,16 @@ Note: this script depends on the core SDK repository tool 'stdk-qrgen', so prior
 This is done in the Developer Workspace.  One project/device profile must be created for each TYPE of device you are using (e.g. panel, contact, motion, smoke, CO2)
 Recommended parameters to use in the Developer Workspace device profile definition screens are as follows:
 ```
-                               DSC Panel              Contact Device          Motion Device        
-                               --------------------   --------------------    ---------------------
+                               DSC Panel              Contact Device          Motion Device            Smoke Detector          CO2 Detector
+                               --------------------   --------------------    ---------------------    --------------------    ----------------------
 Device Profile
-  Name                         DSC_Panel              DSC_Contact             DSC_Motion     
-  Version                      0.1                    0.1                     0.1
-  Device Type                  Switch                 ContactSensor           MotionSensor
-  Components & Capabilities*   Health Check (opt)     Health Check (opt)      Health Check (opt)
-                               partitionStatus        contactStatus           motionStatus
-                               partitioncommand       zonebypass              zonebypass
-                               dscdashswitch
+  Name                         DSC_Panel              DSC_Contact             DSC_Motion               DSC_Smoke               DSC_CO2
+  Version                      0.1                    0.1                     0.1                      0.1                     0.1
+  Device Type                  Switch                 ContactSensor           MotionSensor             SmokeDetector           SmokeDetector
+  Components & Capabilities*   Health Check (opt)     Health Check (opt)      Health Check (opt)       Health Check (opt)      Health Check (opt)
+                               partitionStatus        contactSensor           motionSensor             smokeDetector           carbonMonoxideDetector
+                               partitioncommand       contactStatus           motionStatus             smokeStatus             co2Status
+                               dscdashswitch          zonebypass              zonebypass               zonebypass              zonebypass
                                dscstayswitch
                                dscawayswitch
                                dscselectswitch
@@ -110,7 +110,7 @@ GUI displays are implemented with GTK3+.  If there is little interest in the GUI
 Loading of device apps is initiated by DSCmanager through a bash script so that users can modify it for preference of running apps in foreground vs. background, piping output to logfiles, GUI option selection, etc.
 
 #### New to Alarmserver?
-Alarmserver is a program that will interface with an EyezOn Envisalink board that is wired to your DSC alarm board.  Alarmserver provides an HTTP interface to/from the Envisalink via Ethernet so you can control, and get status from, your DSC alarm system.  It was originally implemented to integrate with SmartThings via the graph URL, but that option may be going away sometime in 2021 or 2022 as SmartThings evolves it's platform.  Ideally, you already have Alarmserver working in this original configuration, so that you've already configured your zones and have it successfully talking to the Envisalink and your DSC alarm system.  
+Alarmserver is a program that will interface with an EyezOn Envisalink module that is wired to your DSC system board.  Alarmserver provides a software interface to/from the Envisalink via Ethernet so you can control, and get status from, your DSC alarm system.  It was originally implemented to integrate with SmartThings via the graph URL, but that option may be going away sometime in 2021 or 2022 as SmartThings evolves it's platform.  Ideally, you already have Alarmserver working in this original configuration, so that you've already configured your zones and have it successfully talking to the Envisalink and your DSC alarm system.  
 
 For those new to alarmserver itself, please ask for assistance in the SmartThings Community topic for alarmserver.
 
