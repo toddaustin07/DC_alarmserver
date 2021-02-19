@@ -42,7 +42,7 @@ Note: this script depends on the core SDK repository tool 'stdk-qrgen', so prior
 ### Additional scripts
 - startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver; this is optional- you can configure loading anyway you like, e.g. auto-load at boot time through systemd, etc
 - buildloader - used by ASdevsetup; creates loaddevs script that is used by DSCmanager to start up each device app (zones + panel)
-- loaddevs - used by DSCmanager to load all device apps at startup 
+- loaddevs - invoked by DSCmanager to load all device apps at startup 
 - STdevsn - list serial numbers associated with each device app
 
 
