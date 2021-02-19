@@ -60,9 +60,10 @@ Device Profile
 
 Onboarding
   Onboarding name                                            <<  DSC Zone Device >>
-  Authentication type                                           << ED25519 >>
-  Setup ID                                                        << 02 >>
+  Authentication type                                            << ED25519 >>
+  Setup ID                                                         << 02 >>
   Instructions                                              << whatever you'd like >>
+  Confirm Device                                              << 'Just Works' >>
 
 Product Info
   Category                                                      << WiFi/Hub >>
