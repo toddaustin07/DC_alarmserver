@@ -1,6 +1,6 @@
 #!/bin/python3
 ###########################################################################
-# Copyright 2021 Todd A. Austin  Version 20210210
+# Copyright 2021 Todd A. Austin  Version 20210220
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -261,7 +261,7 @@ if __name__ == '__main__':
         exit(-1)
 
     if (len(sys.argv) != 2):
-        print("Usage:  makecapabilities <create | update | delete>")
+        print("Usage:  STcapabilities <create | update | delete>")
         exit(0)
 
     mode=sys.argv[1]
