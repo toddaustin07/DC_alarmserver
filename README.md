@@ -17,7 +17,7 @@ The panel device app, in addition to handling the panel device interface to Smar
 
 ## Automated Setup Tools
 
-### ASdevsetup
+### ASdevsetup bash script: setup
 Run this script using one argument that is the full pathname of your alarmserver.cfg file.  The script will read your alarmserver.cfg file to get your defined zones, set up device subdirectories, create device serial numbers, initialize a device loader script (loaddevs), and modify alarmserver.cfg.  Upon successful completion, a file called 'serialnums' will be created that contains a sorted list of the created device serial numbers and public keys that you can use to copy and paste into the Developer Workspace device profiles (under 'Test Devices') later on.  Note: For your convenience, the serialnums file will automatically be displayed in a pop up mousepad gui window.  Be sure to expand the window width if needed for proper formatting.
 
 Note: the ASdevsetup script depends on the core SDK repository tool 'stdk-keygen', so prior installation via my rpi-st-devices package is required.
@@ -33,8 +33,8 @@ You can also later use this tool to update the capabilities and presentations by
 
 Finally, using a 'delete' argument, this tool will delete all capabilities and presentations as contained in the 'created' directory.  The local json files in the 'created' subdirectory are NOT deleted - in case you wanted to archive them, so manually delete them if you no longer need them.  Or, move them to an archive folder for later reference.
 
-### Device Onboarding Helper (wip)
-Run this script once everything is configured & installed, i.e. ASdevsetup is complete, device projects are defined in Developer Workspace, and onboarding_config.json files have been downloaded to the device subdirectories.
+### onboard bash script - Device Onboarding Helper 
+Run this script once everything is configured & installed, i.e. you've run ASdevsetup, device profiles are defined in Developer Workspace, and onboarding_config.json files have been downloaded to the device subdirectories.
 This script will automate the creation of QR codes for each device (used by mobile app during initial device onboarding) and ensure everything is prepared for initial provisioning of all device apps (zone + panel)
 
 Note: this script depends on the core SDK repository tool 'stdk-qrgen', so prior installation via my rpi-st-devices package is required.
