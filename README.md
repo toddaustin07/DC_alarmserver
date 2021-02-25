@@ -15,6 +15,9 @@ Alarmserver is a program that will interface with an EyezOn Envisalink module th
 
 For those new to alarmserver itself, please ask for assistance in the SmartThings Community topic for alarmserver.
 
+#### Escape plan
+Worried about messing up your current alarmserver/SmartThings setup?  Rest easy, because at any time you can revert back to your current setup quite easily by simply restoring your original alarmserver.cfg file which will be saved for you before it is modified for a direct-connect configuration.  Alarmserver itself is not touched, nor are your current  SmartThings devices.
+
 ## Pre-requisites
 - Installed, configured, and tested Direct-connect enablement package for Raspberry Pi (rpi-st-device): https://toddaustin07.github.io/
 - Installed and configured alarmserver package: https://github.com/rtorchia/DSC-Envisalink/tree/master/alarmserver
@@ -132,6 +135,8 @@ The panel device detail screen has a number of features.  First is the partition
 ### Operational Specifics:
 
 Alarmserver is re-directed via its config file to send/receive messages to a locally running process on your Pi (DSCmanager), rather than to the former SmartThings graph URL.  DSCmanager then acts as traffic coordinator to forward messages to the appropriate zone/panel device app (DSCzone).  The device apps are connected to SmartThings via the direct-connect API using the ST core SDK (which uses MQTT in the background).  Messages from SmartThings (commands and state changes) are received directly by the respective Pi device app, which in turn routes commands back down to alarmserver via DSCmanager.  UNIX named sockets are used for all IPC between DSCmanager and device apps because it is fast and efficient.  All applications are written and compiled C for optimal speed and compactness.  
+
+The DSC devices represented in your SmartThings mobile app will be all new for this directly-connected implementation of alarmserver.  For those currently using alarmserver, your current devices will not be effected or used.  In fact, if you don't delete those original alarmserver devices, you can revert back to the prior operation of alarmserver at any time by simply replacing alarmserver.cfg with your original file, which was saved as alarmserver.cfg_ORIG.
 
 GUI displays are implemented with GTK3+.  Currently, gui windows are optional for the zone device apps, but required for the panel app.  If it turns out there is little interest in the GUIs, I may remove that code for the sake of further efficiency, since it does increase the amount of resident memory required for each app whether you use the GUI option or not.
 
