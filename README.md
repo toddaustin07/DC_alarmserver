@@ -5,6 +5,11 @@ This repository contains files to implement alarmserver on a Raspberry Pi with d
 Zones device apps can optionally display a GUI window on the Raspbery Pi desktop (one for each zone).  Alternatively they can be run in background with logfiles.
 The panel device app, in addition to handling the panel device interface to SmartThings, will also display a full DSC panel GUI window on the Pi desktop for local monitoring and control of the alarm system.  For those not running the Pi desktop, I can provide a non-GUI version upon request.
 
+### Why Bother?!
+Good question.  This implementation is more complex and requires more effort to set up than what we have currently.  However, based on statements from Samsung, it is expected that the way alarmserver currently connects to SmartThings (via graph URL) may be going away in the next year or two, and replaced by two options: cloud-connected, or direct-connected devices (the third option - hub-connected - is probably not an option for this).  Cloud-connected devices will require code to be implemented on AWS or your own self-managed internet server.  Direct-connected devices provides a way to keep all custom code running locally on a Raspberry Pi.  
+
+At this time, we don't know when/if the graph URL connection to SmartThings will be sunset, but when/if it is, anyone running alarmserver will need a new solution.  This project lets you 'future-proof' your DSC integration with SmartThings since it utilizes the 'new platform' implementation methods.
+
 ### Limitations
 - Only one DSC partition is currently supported
 - Smoke and CO2 zones have not been tested
