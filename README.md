@@ -8,7 +8,9 @@ The panel device app, in addition to handling the panel device interface to Smar
 ### Why Bother?!
 Good question.  This implementation is more complex and requires more effort to set up than what we have currently.  However, based on statements from Samsung, it is expected that the way alarmserver currently connects to SmartThings (via graph URL) may be going away in the next year or two, and replaced by two options: cloud-connected, or direct-connected devices (the third option - hub-connected - is at present limited to zigbee and zwave devices).  Cloud-connected devices will require code to be implemented on AWS or your own self-managed internet server.  Direct-connected devices provides a way to keep all custom code running locally on a Raspberry Pi.  
 
-At this time, we don't know when/if the graph URL connection to SmartThings will be sunset, but when/if it is, anyone running alarmserver will need a new solution.  This project lets you 'future-proof' your DSC integration with SmartThings since it utilizes the 'new platform' implementation methods.
+Also expected to be sunset are all groovy-based DTHs and applications, which the current implementation of alarmserver also depends on.
+
+At this time, we don't know exactly when these things will be sunset, but if/when it happens, everyone running alarmserver will need a new solution.  This project lets you 'future-proof' your DSC integration with SmartThings since it utilizes the 'new platform' implementation methods.
 
 ### Limitations
 - Only one DSC partition is currently supported
