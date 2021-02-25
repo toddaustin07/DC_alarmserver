@@ -121,7 +121,7 @@ python3 alarmserver -c <alarmserver.cfg file path/name>
 ```
 For subsequent startup, you can modify and use the loaddevs script to load your device apps any way you wish (in background, in a terminal, with GUI, at boot time, etc.).  Some example loaddevs alternatives are provided for reference.  Recommended loading order for everything is 1) device apps, 2) DSCmanager, 3) alarmserver.  The 'startall' script can be used/modified to do this.
 
-## Using the DSC device apps in the SmartThings Mobile App
+## Using your DSC devices in the SmartThings Mobile App
 The first thing you will want to do after your devices are onboarded and happily humming away on your Pi is to go into the mobile app and group the DSC devices into a room, and rename each of them to something useful.  I use of combination of zone number (Z1) and VERY abbreviated zone description - short enough to fit on the dashboard card.  
 
 The zone devices have no action buttons on the dashboard - just the status of the device (open/closed, motion/no motion, etc.).  On the details screen, you'll see a zone status field, which most of the time will show the open/close-type status of the device, but may also show other states such as alarm, trouble, bypassed, etc.  Also on the details screen is a slider switch you can use to turn on and off bypass state for the zone.
