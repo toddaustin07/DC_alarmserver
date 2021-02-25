@@ -32,13 +32,13 @@ Worried about messing up your current alarmserver/SmartThings setup?  Rest easy,
 
 ## Automated Setup Tools
 
-### ASdevsetup bash script: setup
-Run this script using one argument that is the full pathname of your alarmserver.cfg file.  The script will read your alarmserver.cfg file to get your defined zones, set up device subdirectories, create device serial numbers, initialize a device loader script (loaddevs), and modify alarmserver.cfg.  Upon successful completion, a file called 'serialnums' will be created that contains a sorted list of the created device serial numbers and public keys that you can use to copy and paste into the Developer Workspace device profiles (under 'Test Devices') later on.  Note: For your convenience, the serialnums file will automatically be displayed in a pop up mousepad gui window.  Be sure to expand the window width if needed for proper formatting.
+### Config Setup
+Run the bash script 'ASdevsetup' using one argument that is the full pathname of your alarmserver.cfg file.  The script will read your alarmserver.cfg file to get your defined zones, set up device subdirectories, create device serial numbers, initialize a device loader script (loaddevs), and modify alarmserver.cfg.  Upon successful completion, a file called 'serialnums' will be created that contains a sorted list of the created device serial numbers and public keys that you can use to copy and paste into the Developer Workspace device profiles (under 'Test Devices') later on.  Note: For your convenience, the serialnums file will automatically be displayed in a pop up mousepad gui window.  Be sure to expand the window width if needed for proper formatting.
 
 Note: the ASdevsetup script depends on the core SDK repository tool 'stdk-keygen', so prior installation via my rpi-st-devices package is required.
 
-### STcapabilities.py - auto creation/update/delete of SmartThings custom capabilities 
-The devices that represent the zones and panel of the alarm system utilize a combination of 'stock' SmartThings device capabilities plus a number of 'custom' capabilities.  Unfortunately under the current SmartThings platform, custom capabilities utilized for direct connect devices must be defined under your own SmartThings developer account.  There currently is no way to share or otherwise utilize custom capabilities defined by someone else (unless of course they are formally certified by SmartThings).  So unfortunately as it currently stands, each user must re-create the needed custom capabilities under their own account.  To ease this burden, I have provided a Python3 script that utilizes the SmartThings Restful API to automate creation of these custom capabilities and their companion presentations - all of which are represented in json files provided in this package in the json/capabilities subdirectory.  You only need to provide your SmartThings personal token.
+### Auto creation/update/delete of SmartThings custom capabilities 
+The devices that represent the zones and panel of the alarm system utilize a combination of 'stock' SmartThings device capabilities plus a number of 'custom' capabilities.  Unfortunately under the current SmartThings platform, custom capabilities utilized for direct connect devices must be defined under your own SmartThings developer account.  There currently is no way to share or otherwise utilize custom capabilities defined by someone else (unless of course they are formally certified by SmartThings).  So unfortunately as it currently stands, each user must re-create the needed custom capabilities under their own account.  To ease this burden, I have provided a Python3 script 'STcapabilities.py' that utilizes the SmartThings Restful API to automate creation of these custom capabilities and their companion presentations - all of which are represented in json files provided in this package in the json/capabilities subdirectory.  You only need to provide your SmartThings personal token.
 
 You will later select these new custom capabilities, created under your account, as part of the device profile setup in the Developer Workspace.
 
@@ -48,13 +48,13 @@ You can also later use this tool to update the capabilities and presentations by
 
 Finally, using a 'delete' argument, this tool will delete all capabilities and presentations as contained in the 'created' directory.  The local json files in the 'created' subdirectory are NOT deleted - in case you wanted to archive them, so manually delete them if you no longer need them.  Or, move them to an archive folder for later reference.
 
-### onboard bash script - Device Onboarding Helper 
-Run this script once everything is configured & installed, i.e. you've run ASdevsetup, device profiles are defined in Developer Workspace, and onboarding_config.json files have been downloaded to the device subdirectories.
+### Device Onboarding Helper 
+Run the bash script 'onboard' once everything is configured & installed, i.e. you've run ASdevsetup, device profiles are defined in Developer Workspace, and onboarding_config.json files have been downloaded to the device subdirectories.
 This script will automate the creation of QR codes for each device (used by mobile app during initial device onboarding) and ensure everything is prepared for initial provisioning of all device apps (zone + panel)
 
 Note: this script depends on the core SDK repository tool 'stdk-qrgen', so prior installation via my rpi-st-devices package is required.
 
-### Additional scripts
+### Additional scripts provided
 - startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver; this is optional- you can configure loading anyway you like, e.g. auto-load at boot time through systemd, etc
 - buildloader - used by ASdevsetup; creates loaddevs script that is used by DSCmanager to start up each device app (zones + panel)
 - loaddevs - invoked by DSCmanager to load all device apps at startup 
@@ -108,7 +108,7 @@ You will choose the option to 'Customize through device configuration file'. Fir
 In this part of the Developer Workspace setup, you identify the serial numbers and keys of the devices you'll be using under each profile.  You can reference the serialnums file that was created earlier by the ASdevsetup tool for a convenient list by device type.  On the Developer Workspace Test Devices screen under each device type profile, click on the 'REGISTER NEW DEVICE' button and copy/paste the respective serial number and public key from the serialnums file.
 
 ### Download onboarding_config.json files
-When complete with the above, onboarding_config.json files - generated by the Developer Workspace when you define your device profiles - must be downloaded and placed in each of the appropriate device directories (one json file per device type)
+When complete with the above device profile definition tasks, *onboarding_config.json files* - generated by the Developer Workspace - must be downloaded and placed in each of the appropriate device directories (one json file per device type)
 
 ## Initial onboarding/provisioning of each zone device + panel device using mobile app
 You will use the onboarding helper script 'onboard', and the SmartThings mobile app, to connect with each of the zone & panel device apps on your Raspberry Pi via wireless in order to complete onboarding of each device (one per zone + panel).  When you are ready to proceed, run the onboard script.  The first thing it does is verify you have all necessary files installed in your device subdirectories (most of this should have been all taken care of when you ran the ASdevsetup script).  It will confirm that you have downloaded your onboarding_config.json files into the device subdirectories and will create QR codes for each device that you will use during onboarding.  Once everything is verified and there are no errors, it will proceed to launch your device apps one at a time and step you through the onboarding process.
