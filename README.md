@@ -152,8 +152,8 @@ The procedure of initially provisioning your devices via mobile phone wireless c
 - If onboarding manually (i.e. not using the onboarding helper script), use gpicview to display the QR code located in each device directory
 - Be sure that you've given the Pi device app enough time to load and get in to a 'listen' state before you get too far in the mobile app
 - If the mobile app fails or seems to be stuck, unload and reload the app before trying again; the 'retry' option in the mobile app rarely works
-- If you wait long enough the Pi device app will usually time out after errors and return your wireless state back to normal.  If you Ctrl-c out of the app early, your wireless may be left in the 'SoftAP' state.  If this happens use the ~/rpi-st-device/resetAP utility to rest your wireless state before restarting the device app.
+- If you wait long enough the Pi device app will usually time out after errors and return your wireless state back to normal.  If you Ctrl-c out of the app early, your wireless may be left in the 'SoftAP' state.  If this happens use the ~/rpi-st-device/resetAP utility to reset your wireless state before restarting the device app.
 - Monitor the log messages coming from the device app; they can help determine where errors may be occuring.  Copy and paste them to a file to provide later if asking for help.
-- Once the mobile phone is done exchanging info with your Pi, the Pi device app will be waiting for the SmartThings MQTT server to respond back with successful device registration.  This can take up to 40 seconds or more from the time you had selected an AP in the mobile app, so be patient.
+- Once the mobile app is done exchanging info with your Pi and you've selected a wireless AP for the Pi to reconnect to (moot if you have an ethernet connection), the Pi device app will then wait for the SmartThings MQTT server to respond back with successful device registration.  This can take up to 40 seconds or more from the time you had selected an AP in the mobile app, so be patient.
 
 See the detail configuration guide of the rpi-st-device package for additional information.
