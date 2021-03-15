@@ -30,10 +30,9 @@ from os import path
 from os import listdir
 import sys
 import glob
+import platform
 
 # GLOBAL CONSTANTS
-
-CONFIGFILE = os.environ['HOMEPATH']+os.sep+".stcapcfg"
 
 TOKEN_SIZE = 36
 VID_SIZE = 36
@@ -741,7 +740,7 @@ def readcfg():
         myprefix_text.set("")
         mnmn_text.set("SmartThingsCommunity")
         devtype_text.set("profile")
-        defpath_text.set(os.environ['HOMEPATH']+os.sep+"SmartThings"+os.sep+"json")
+        defpath_text.set(HOMEPATH+os.sep+"SmartThings"+os.sep+"json")
         
     headers['Authorization'] = TOKEN+token_text.get()
     savedir = defpath_text.get()
@@ -1295,110 +1294,126 @@ def exitfunc():
 #                             * MAIN *
 ##########################################################################
 
-currentdir  = os.getcwd()
-readcfg()
+if __name__ == '__main__':
 
-# TKINTER INITIALIZATION STUFF
+    global CONFIGFILE
+    global HOMEPATH
 
-root.title("SmartThings Device Config Cloner")
+    ostype = platform.system()
+    if ostype == "Linux":
+        HOMEPATH = os.environ['HOME']
+    elif ostype == "Windows":
+        HOMEPATH = os.environ['HOMEPATH']
+    else:
+        print ("Unrecognized OS platform\n")
+        exit -1
+        
+    CONFIGFILE = HOMEPATH+os.sep+".stcapcfg"
+    
+    currentdir  = os.getcwd()
+    readcfg()
 
-c = ttk.Frame(root, padding="3 3 12 12")
-c.grid(column=0, row=0, sticky=(N, W, E, S))
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
-root.option_add('*tearOff', FALSE)
+    # TKINTER INITIALIZATION STUFF
 
-# STYLE STUFF
+    root.title("SmartThings Device Config Cloner")
 
-fname_fontStyle = tkFont.Font(family="Raleway", size=10)
-label_fontStyle = tkFont.Font(family="Raleway", size=10)
-smlabel_fontStyle = tkFont.Font(family="Raleway", size=8)
+    c = ttk.Frame(root, padding="3 3 12 12")
+    c.grid(column=0, row=0, sticky=(N, W, E, S))
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    root.option_add('*tearOff', FALSE)
 
-# MENU STUFF
+    # STYLE STUFF
 
-menubar = Menu(root)
-root['menu'] = menubar
+    fname_fontStyle = tkFont.Font(family="Raleway", size=10)
+    label_fontStyle = tkFont.Font(family="Raleway", size=10)
+    smlabel_fontStyle = tkFont.Font(family="Raleway", size=8)
 
-menu_file = Menu(menubar)
-menubar.add_cascade(menu=menu_file, label='File')
-menu_file.add_command(label='Open local Device Config json file...', command=opencfg)
-menu_file.add_command(label='Retrieve Device Config from SmartThings...', command=retrievecfg)
-menu_file.add_command(label='Close file', command=closefile)
-menu_file.add_command(label='Exit', command=exitfunc)
+    # MENU STUFF
 
-menu_config = Menu(menubar)
-menubar.add_cascade(menu=menu_config, label='Preferences')
-menu_config.add_command(label='Configure', command=getconfig)
+    menubar = Menu(root)
+    root['menu'] = menubar
 
-menu_help = Menu(menubar)
-menubar.add_cascade(menu=menu_help, label='Help')
-menu_help.add_command(label='About', command=showhelp)
+    menu_file = Menu(menubar)
+    menubar.add_cascade(menu=menu_file, label='File')
+    menu_file.add_command(label='Open local Device Config json file...', command=opencfg)
+    menu_file.add_command(label='Retrieve Device Config from SmartThings...', command=retrievecfg)
+    menu_file.add_command(label='Close file', command=closefile)
+    menu_file.add_command(label='Exit', command=exitfunc)
 
-hilite = ttk.Style()
-hilite.configure('hilite.TButton', foreground="blue")
+    menu_config = Menu(menubar)
+    menubar.add_cascade(menu=menu_config, label='Preferences')
+    menu_config.add_command(label='Configure', command=getconfig)
 
-# WIDGET DEFINITIONS
+    menu_help = Menu(menubar)
+    menubar.add_cascade(menu=menu_help, label='Help')
+    menu_help.add_command(label='About', command=showhelp)
 
-devmnmn_label = ttk.Label(c, textvariable=devmnmn_text, anchor="center", width=40)
-clonedmnmn_label = ttk.Label(c, textvariable=clonedmnmn_text, anchor="center", width=40)
+    hilite = ttk.Style()
+    hilite.configure('hilite.TButton', foreground="blue")
 
-devconf = ttk.Label(c, text="", width=40, anchor="center", background="ivory", foreground="blue")
-mydevconf = ttk.Label(c, text="", width=40, anchor="center", background="ivory", foreground="blue")
-presentid_label1 = ttk.Label(c, textvariable=presentid1, anchor="center", width=40, font=smlabel_fontStyle)
-presentid_label2 = ttk.Label(c, textvariable=presentid2, anchor="center", width=40, font=smlabel_fontStyle)
+    # WIDGET DEFINITIONS
 
-ref_caplistbox = Listbox(c, listvariable=ref_cnames, height=8, width=40, selectmode="extended")
-ref_capstatbox = Listbox(c, listvariable=refstat_cnames, height=8, width=2, selectmode="extended", foreground="dark green")
+    devmnmn_label = ttk.Label(c, textvariable=devmnmn_text, anchor="center", width=40)
+    clonedmnmn_label = ttk.Label(c, textvariable=clonedmnmn_text, anchor="center", width=40)
 
-cre_caplistbox = Listbox(c, listvariable=cre_cnames, height=8, width=40, selectmode="extended")
-cre_capstatbox = Listbox(c, listvariable=crestat_cnames, height=8, width=2, selectmode="extended", foreground="dark green")
+    devconf = ttk.Label(c, text="", width=40, anchor="center", background="ivory", foreground="blue")
+    mydevconf = ttk.Label(c, text="", width=40, anchor="center", background="ivory", foreground="blue")
+    presentid_label1 = ttk.Label(c, textvariable=presentid1, anchor="center", width=40, font=smlabel_fontStyle)
+    presentid_label2 = ttk.Label(c, textvariable=presentid2, anchor="center", width=40, font=smlabel_fontStyle)
 
-ref_capslabel = ttk.Label(c, text="Custom Capabilities in device config", font=label_fontStyle)
-cre_capslabel = ttk.Label(c, text="Cloned Custom Capabilities", font=label_fontStyle)
-getcapbtn = ttk.Button(c, text="RETRIEVE", command=getcaps, state="disabled", style='hilite.TButton')
-putcapbtn1 = ttk.Button(c, text="Submit", command=putcaps1, state="disabled")
-putcapbtn2 = ttk.Button(c, text="Submit", command=putcaps2, state="disabled")
-clonecapbtn = ttk.Button(c, text=">> Copy CCs Only >>", command=clonecaps, state="disabled")
-statuslabel = ttk.Label(c, textvariable=statusmsg, width=90, anchor="w", font=fname_fontStyle, foreground="brown")
-clonedevbtn = ttk.Button(c, text=">> Copy Device Config File >>", command=clonedev, state="disabled")
-cloneallbtn = ttk.Button(c, text=">> COPY ALL >>", command=cloneall, state="disabled", style='hilite.TButton')
-newvidbtn1 = ttk.Button(c, text="Submit for new vid", command=newvid1, state="disabled")
-newvidbtn2 = ttk.Button(c, text="Submit for new vid", command=newvid2, state="disabled")
-submitallbtn = ttk.Button(c, text="SUBMIT ALL", command=submitall, state="disabled", style='hilite.TButton')
+    ref_caplistbox = Listbox(c, listvariable=ref_cnames, height=8, width=40, selectmode="extended")
+    ref_capstatbox = Listbox(c, listvariable=refstat_cnames, height=8, width=2, selectmode="extended", foreground="dark green")
 
-# WIDGET GRID PLACEMENT
+    cre_caplistbox = Listbox(c, listvariable=cre_cnames, height=8, width=40, selectmode="extended")
+    cre_capstatbox = Listbox(c, listvariable=crestat_cnames, height=8, width=2, selectmode="extended", foreground="dark green")
 
-devmnmn_label.grid(columnspan=2, column=0, row=1, sticky=S, pady=(5,0), padx=(15,0))
-clonedmnmn_label.grid(columnspan=2, column=4, row=1, sticky=SW, pady=(5,0))
+    ref_capslabel = ttk.Label(c, text="Custom Capabilities in device config", font=label_fontStyle)
+    cre_capslabel = ttk.Label(c, text="Cloned Custom Capabilities", font=label_fontStyle)
+    getcapbtn = ttk.Button(c, text="RETRIEVE", command=getcaps, state="disabled", style='hilite.TButton')
+    putcapbtn1 = ttk.Button(c, text="Submit", command=putcaps1, state="disabled")
+    putcapbtn2 = ttk.Button(c, text="Submit", command=putcaps2, state="disabled")
+    clonecapbtn = ttk.Button(c, text=">> Copy CCs Only >>", command=clonecaps, state="disabled")
+    statuslabel = ttk.Label(c, textvariable=statusmsg, width=90, anchor="w", font=fname_fontStyle, foreground="brown")
+    clonedevbtn = ttk.Button(c, text=">> Copy Device Config File >>", command=clonedev, state="disabled")
+    cloneallbtn = ttk.Button(c, text=">> COPY ALL >>", command=cloneall, state="disabled", style='hilite.TButton')
+    newvidbtn1 = ttk.Button(c, text="Submit for new vid", command=newvid1, state="disabled")
+    newvidbtn2 = ttk.Button(c, text="Submit for new vid", command=newvid2, state="disabled")
+    submitallbtn = ttk.Button(c, text="SUBMIT ALL", command=submitall, state="disabled", style='hilite.TButton')
 
-devconf.grid(columnspan=2, column=0, row=2, padx=(20,0), pady=(5,0))
-mydevconf.grid(columnspan=3, column=4, row=2, pady=(5,0))
-presentid_label1.grid(columnspan=2, column=0, row=3, pady=(3,2), padx=(20,0))
-presentid_label2.grid(columnspan=2, column=4, row=3, pady=(3,2))
+    # WIDGET GRID PLACEMENT
 
-cloneallbtn.grid(column=3, row=0, sticky=N, pady=(15,0), padx=(0,0))
-submitallbtn.grid(columnspan=2, column=4, row=0, sticky=N, pady=(15,15), padx=(0,0))
-clonedevbtn.grid(column=3, row=2, pady=(10,0), padx=(5,15))
-clonecapbtn.grid(column=3, row=7, padx=(0,0))
+    devmnmn_label.grid(columnspan=2, column=0, row=1, sticky=S, pady=(5,0), padx=(15,0))
+    clonedmnmn_label.grid(columnspan=2, column=4, row=1, sticky=SW, pady=(5,0))
 
-ref_capslabel.grid(columnspan=2, column=0, row=6, padx=(15,0), pady=(10,0))
-ref_caplistbox.grid(columnspan=2, rowspan=2, column=0, row=7, sticky=E, padx=(15,0))
-ref_capstatbox.grid(columnspan=1, rowspan=2, column=2, row=7, sticky=W, padx=(0,0))
+    devconf.grid(columnspan=2, column=0, row=2, padx=(20,0), pady=(5,0))
+    mydevconf.grid(columnspan=3, column=4, row=2, pady=(5,0))
+    presentid_label1.grid(columnspan=2, column=0, row=3, pady=(3,2), padx=(20,0))
+    presentid_label2.grid(columnspan=2, column=4, row=3, pady=(3,2))
 
-newvidbtn1.grid(columnspan=2, column=0, row=4, pady=(0,30))
-newvidbtn2.grid(columnspan=2, column=4, row=4, pady=(0,30))
+    cloneallbtn.grid(column=3, row=0, sticky=N, pady=(15,0), padx=(0,0))
+    submitallbtn.grid(columnspan=2, column=4, row=0, sticky=N, pady=(15,15), padx=(0,0))
+    clonedevbtn.grid(column=3, row=2, pady=(10,0), padx=(5,15))
+    clonecapbtn.grid(column=3, row=7, padx=(0,0))
 
-cre_capslabel.grid(columnspan=2, column=4, row=6, pady=(10,0))
-cre_caplistbox.grid(columnspan=2, rowspan=2, column=4, row=7)
-cre_capstatbox.grid(columnspan=1, rowspan=2, column=8, row=7, sticky=W)
+    ref_capslabel.grid(columnspan=2, column=0, row=6, padx=(15,0), pady=(10,0))
+    ref_caplistbox.grid(columnspan=2, rowspan=2, column=0, row=7, sticky=E, padx=(15,0))
+    ref_capstatbox.grid(columnspan=1, rowspan=2, column=2, row=7, sticky=W, padx=(0,0))
 
-getcapbtn.grid(columnspan=1, column=0, row=9, padx=(0,0), pady=(10,10))
-putcapbtn1.grid(columnspan=1, column=1, row=9, padx=(0,0), pady=(10,10))
-putcapbtn2.grid(columnspan=2, column=4, row=9, padx=(0,0), pady=(10,10))
+    newvidbtn1.grid(columnspan=2, column=0, row=4, pady=(0,30))
+    newvidbtn2.grid(columnspan=2, column=4, row=4, pady=(0,30))
 
-statuslabel.grid(columnspan=6, column=0, row=10, sticky=W, pady=(15,0), padx=(20,0))
-  
-c.grid_columnconfigure(8, weight=1)
-c.grid_rowconfigure(11, weight=1)
+    cre_capslabel.grid(columnspan=2, column=4, row=6, pady=(10,0))
+    cre_caplistbox.grid(columnspan=2, rowspan=2, column=4, row=7)
+    cre_capstatbox.grid(columnspan=1, rowspan=2, column=8, row=7, sticky=W)
 
-root.mainloop()
+    getcapbtn.grid(columnspan=1, column=0, row=9, padx=(0,0), pady=(10,10))
+    putcapbtn1.grid(columnspan=1, column=1, row=9, padx=(0,0), pady=(10,10))
+    putcapbtn2.grid(columnspan=2, column=4, row=9, padx=(0,0), pady=(10,10))
+
+    statuslabel.grid(columnspan=6, column=0, row=10, sticky=W, pady=(15,0), padx=(20,0))
+      
+    c.grid_columnconfigure(8, weight=1)
+    c.grid_rowconfigure(11, weight=1)
+
+    root.mainloop()
