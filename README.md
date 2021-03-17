@@ -124,15 +124,13 @@ For subsequent startup, you can modify and use the loaddevs script to load your 
 ## Using your DSC devices in the SmartThings Mobile App
 The first thing you will want to do after your devices are onboarded and happily humming away on your Pi is to go into the mobile app and group the DSC devices into a room, and rename each of them to something useful, e.g.  a combination of zone number (Z1) and abbreviated zone description - short enough to fit on the dashboard card.  
 
-The zone devices have no action buttons on the dashboard - just the status of the device (open/closed, motion/no motion, etc.).  On the details screen, you'll see a zone status field, which most of the time will show the open/close-type status of the device, but may also show other states such as alarm, trouble, bypassed, etc.  Also on the details screen is a slider switch you can use to turn on and off bypass state for the zone.
+The zone devices have no action buttons on the dashboard - just the status of the device (open/closed, motion/no motion, etc.).  On the details screen, you'll see a zone status field, which most of the time will show the open/close-type status of the device, but may also show other states such as alarm, trouble, bypassed, etc.  Also on the details screen is a slider switch you can use to turn on and off bypass state for the zone.  Note also that if an alarm condition occurs, the zone that caused the alarm will continue to show 'Alarm memory' on the details screen status field until the system is armed again.
 
 The panel device has a bit more function.  On the dashboard, the button is used to arm or disarm the partition.  Whether it performs an arm-away or arm-stay is configured on the details screen (explained below).  The state shown on the dashboard is whatever the DSC is reporting such as ready, not ready, exit delay, armed-away or armed-stay, alarm, etc.  I have eliminated the force-ready status since it's not very useful and in the old alarmserver implementation always caused a crazy amount of constant state changes, filling up the log and messages everytime someone opened a door or walked by a motion sensor.
 
 The dashboard icon on the panel device is supposed to be gray when in Ready state, and color highlighted for anything else.  There is currently a SmartThings mobile app bug (reported) where this is not working on IOS-based devices.
 
 The panel device detail screen has a number of features.  First is the partition status - same as what is shown on the dashboard.  Below that is an 'LED status' field which will show additional status items such as Trouble, Memory, Bypass, and Fire.  Next are discrete buttons to arm stay or arm away (or disarm afterwards).  Then there is a button to bring up a list of additional partition commands that can be invoked.  Finally there is a toggle button to configure what happens when you tap the button on the dashboard.  It can be set to either type=arm-away or type=arm-stay, whichever you prefer.  Remember you can always go to the details screen to directly arm either way, no matter how the dashboard button is configured.  These detail screen discrete arm buttons will probably be what you want to use for automation 'THEN' actions (and Partition Status attribute for IF conditions).
-
-If an alarm condition occurs, the zone that caused the alarm will continue to show 'Alarm memory' on the details screen status field until the system is armed again.
 
 ## Operational Specifics:
 
@@ -154,12 +152,15 @@ Loading of device apps is initiated by DSCmanager through a bash script so that 
 192.168.1.100   EnvisaLink      <<< or whatever IP address you are using
 ```
 #### The device onboarding process 
-The procedure of initially provisioning your devices via mobile phone wireless can be finicky.  Retries may be needed if a failure is encountered.  Here are some additional tips to follow:
+The procedure of initially provisioning your devices via mobile phone wireless can be finicky and retries may be needed if a failure is encountered.  It is assumed that you've already been through this process at least once from getting the rpi-st-device package up and running with the example switch device app, so this procedure should be familiar.
+
+Here are some tips to follow:
+
 - Stay within 4 feet or so of your Pi when connecting your mobile to the Pi
 - If onboarding manually (i.e. not using the onboarding helper script), use gpicview to display the QR code located in each device directory
 - Be sure that you've given the Pi device app enough time to load and get in to a 'listen' state before you get too far in the mobile app
-- If the mobile app fails or seems to be stuck, unload and reload the app before trying again; the 'retry' option in the mobile app rarely works
-- If you wait long enough (up to a minute or so), the Pi device app will usually time out after an error occurred, and return your Pi's wireless state back to normal.  If you Ctrl-c out of the Pi device app early, your wireless may be left in the 'SoftAP' state.  If this happens use the ~/rpi-st-device/resetAP utility to reset your wireless state before restarting the device app (the onboard script gives you the option to do this automatically)
+- If the mobile app fails or seems to be stuck, unload and reload the mobile app before trying again; the 'retry' option in the mobile app rarely works!
+- If you wait long enough (up to a minute or so), the Pi device app will usually time out after an onboarding error occurred, and return your Pi's wireless state back to normal.  If you Ctrl-c out of the Pi device app early, your wireless may be left in the 'SoftAP' state.  If this happens, use the ~/rpi-st-device/resetAP utility to reset your wireless state before restarting the device app (the onboard script gives you the option to do this for you)
 - Monitor the log messages coming from the device app; they can help determine where errors may be occurring.  Copy and paste them to a file to provide later if asking for help.
 - Once the mobile app is done exchanging info with your Pi and you've selected a wireless AP for the Pi to reconnect to (moot if you have an ethernet connection), the Pi device app will then wait for the SmartThings MQTT server to respond back with successful device registration.  This can take up to 40 seconds or more from the time you had selected an AP in the mobile app, so be patient.
 
