@@ -152,16 +152,15 @@ Loading of device apps is initiated by DSCmanager through a bash script so that 
 192.168.1.100   EnvisaLink      <<< or whatever IP address you are using
 ```
 #### The device onboarding process 
-The procedure of initially provisioning your devices via mobile phone wireless can be finicky and retries may be needed if a failure is encountered.  It is assumed that you've already been through this process at least once from getting the rpi-st-device package up and running with the example switch device app, so this procedure should be familiar.
+It is assumed that you've already been through this process at least once from getting the rpi-st-device package up and running with the example switch device app, so this procedure should be familiar.
 
 Here are some tips to follow:
 
 - Stay within 4 feet or so of your Pi when connecting your mobile to the Pi
 - If onboarding manually (i.e. not using the onboarding helper script), use gpicview to display the QR code located in each device directory
 - Be sure that you've given the Pi device app enough time to load and get in to a 'listen' state before you get too far in the mobile app
-- If the mobile app fails or seems to be stuck, unload and reload the mobile app before trying again; the 'retry' option in the mobile app rarely works!
-- If you wait long enough (up to a minute or so), the Pi device app will usually time out after an onboarding error occurred, and return your Pi's wireless state back to normal.  If you Ctrl-c out of the Pi device app early, your wireless may be left in the 'SoftAP' state.  If this happens, use the ~/rpi-st-device/resetAP utility to reset your wireless state before restarting the device app (the onboard script gives you the option to do this for you)
+- In the event that onboarding a device fails, if you wait long enough (up to 4 minutes max), the Pi device app will usually time out and return your Pi's wireless state back to normal.  If you Ctrl-c out of the Pi device app early, your wireless may be left in the 'SoftAP' state.  If this happens, use the ~/rpi-st-device/resetAP utility to reset your wireless state before restarting the device app (the onboard script gives you the option to do this for you)
 - Monitor the log messages coming from the device app; they can help determine where errors may be occurring.  Copy and paste them to a file to provide later if asking for help.
-- Once the mobile app is done exchanging info with your Pi and you've selected a wireless AP for the Pi to reconnect to (moot if you have an ethernet connection), the Pi device app will then wait for the SmartThings MQTT server to respond back with successful device registration.  This can take up to 40 seconds or more from the time you had selected an AP in the mobile app, so be patient.
+- Once the mobile app is done exchanging info with your Pi and you've selected a wireless AP for the Pi to reconnect to (moot if you have an ethernet connection), the Pi device app will then wait for the SmartThings MQTT server to respond back with successful device registration.  At times, this can take up to 30-40 seconds or more from the time you had selected an AP in the mobile app, so be patient.
 
 See the detail configuration guide of the rpi-st-device package for additional information.
