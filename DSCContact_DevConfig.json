@@ -1,0 +1,77 @@
+{
+    "dashboard": {
+        "states": [
+            {
+                "component": "main",
+                "capability": "contactSensor",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ],
+        "actions": []
+    },
+    "detailView": [
+        {
+            "component": "main",
+            "capability": "healthCheck",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.contactstatus",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.zonebypass",
+            "version": 1,
+            "values": [],
+            "patch": []
+        }
+    ],
+    "automation": {
+        "conditions": [
+            {
+                "component": "main",
+                "capability": "healthCheck",
+                "version": 1,
+                "values": [],
+                "patch": []
+            },
+            {
+                "component": "main",
+                "capability": "partyvoice23922.contactstatus",
+                "version": 1,
+                "values": [],
+                "patch": []
+            },
+            {
+                "component": "main",
+                "capability": "partyvoice23922.zonebypass",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ],
+        "actions": [
+            {
+                "component": "main",
+                "capability": "partyvoice23922.zonebypass",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ]
+    },
+    "type": "profile",
+    "presentationId": "ST_69f2bc09-a48b-4857-84c2-06f3305a378c",
+    "manufacturerName": "fE4b",
+    "vid": "ST_69f2bc09-a48b-4857-84c2-06f3305a378c",
+    "mnmn": "fE4b",
+    "version": "0.1.1"
+}

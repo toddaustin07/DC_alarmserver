@@ -1,0 +1,120 @@
+{
+    "dashboard": {
+        "states": [
+            {
+                "component": "main",
+                "capability": "partyvoice23922.partitionStatus",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ],
+        "actions": [
+            {
+                "component": "main",
+                "capability": "partyvoice23922.dscdashswitch",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ]
+    },
+    "detailView": [
+        {
+            "component": "main",
+            "capability": "partyvoice23922.partitionStatus",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.ledStatus",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.dscstayswitch",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.dscawayswitch",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.partitioncommand",
+            "version": 1,
+            "values": [],
+            "patch": []
+        },
+        {
+            "component": "main",
+            "capability": "partyvoice23922.dscselectswitch",
+            "version": 1,
+            "values": [],
+            "patch": []
+        }
+    ],
+    "automation": {
+        "conditions": [
+            {
+                "component": "main",
+                "capability": "partyvoice23922.partitionStatus",
+                "version": 1,
+                "values": [],
+                "patch": []
+            },
+            {
+                "component": "main",
+                "capability": "partyvoice23922.ledStatus",
+                "version": 1,
+                "values": [],
+                "patch": []
+            },
+            {
+                "component": "main",
+                "capability": "healthCheck",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ],
+        "actions": [
+            {
+                "component": "main",
+                "capability": "partyvoice23922.dscstayswitch",
+                "version": 1,
+                "values": [],
+                "patch": []
+            },
+            {
+                "component": "main",
+                "capability": "partyvoice23922.dscawayswitch",
+                "version": 1,
+                "values": [],
+                "patch": []
+            },
+            {
+                "component": "main",
+                "capability": "partyvoice23922.partitioncommand",
+                "version": 1,
+                "values": [],
+                "patch": []
+            }
+        ]
+    },
+    "type": "profile",
+    "presentationId": "5e555606-e4a3-3730-8e86-26f9667beff3",
+    "manufacturerName": "fE4b",
+    "vid": "5e555606-e4a3-3730-8e86-26f9667beff3",
+    "mnmn": "fE4b",
+    "version": "0.0.1"
+}
