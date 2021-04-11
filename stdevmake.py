@@ -1,6 +1,7 @@
 #!/bin/python3
+# _*_ coding: utf-8 _*_
 ###########################################################################
-# Copyright 2021 Todd A. Austin  Version 1.20210315
+# Copyright 2021 Todd A. Austin  Version 1.20210411
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -175,9 +176,15 @@ def showcfg(pydictfull, filepath):
         return
     
     if 'manufacturerName' in pydictfull:
-        devmnmn_text.set('Manufacturer name: '+pydictfull["manufacturerName"])
+        confmnmn=pydictfull["manufacturerName"]
+        devmnmn_text.set('Manufacturer name: '+confmnmn)
+        
+    elif 'mnmn' in pydictfull:
+        confmnmn=pydictfull["mnmn"]
+        devmnmn_text.set('Manufacturer name: '+confmnmn)
     else:
-        devmnmn_text.set('')
+        confmnmn=''
+        devmnmn_text.set(confmnmn)
     
     devconf.config(text=os.path.basename(filepath))
     devconfname=filepath
@@ -257,8 +264,6 @@ def showcfg(pydictfull, filepath):
     my_mnmn = mnmn_text.get()
     subdirname = os.path.basename(os.path.dirname(filepath))
 
-    print ("subdirname = %s" % subdirname)
-    
     if (subdirname == my_mnmn):                     # If file was located in our mnmn directory...
         newvidbtn1.config(state="enable")
         cloneallbtn.config(state="disable")
@@ -272,8 +277,8 @@ def showcfg(pydictfull, filepath):
 
         clonedevbtn.config(state="enable")          # default to enabled
 
-        if ('manufacturerName' in pydictfull):      # But check to see if this is one of ours
-            if (pydictfull['manufacturerName'] == my_mnmn):
+        if (confmnmn != ''):                        # But check to see if this is one of ours
+            if (confmnmn == my_mnmn):
                 newvidbtn1.config(state="enable")   #   If one of ours, enabled vid submission, turn off clone/copy
                 clonedevbtn.config(state="disable")
                 
@@ -281,7 +286,9 @@ def showcfg(pydictfull, filepath):
         cloneallbtn.config(state="enable")
                 
     if ('presentationId' in pydictfull):
-        presentid1.set('vid: '+pydictfull['presentationId'])
+        presentid1.set(pydictfull['presentationId'])
+    elif ('vid' in pydictfull):
+        presentid1.set(pydictfull['vid'])
     else:
         presentid1.set('')
         
@@ -541,6 +548,8 @@ def getstcaplist():
 
 def getprefix():
     
+    headers['Authorization'] = TOKEN+token_text.get()
+    
     # SmartThings API to create temp dummy capability
     r = requests.post(BASEURL+'/capabilities', headers=headers, data=json.dumps(TESTJSON, indent=4))
 
@@ -755,7 +764,7 @@ def readcfg():
         myprefix_text.set("")
         mnmn_text.set("SmartThingsCommunity")
         devtype_text.set("profile")
-        defpath_text.set(HOMEPATH+os.sep+"SmartThings"+os.sep+"json")
+        defpath_text.set(HOMEPATH+os.sep+"SmartThings_json")
         menubar.entryconfig('File', state="disabled")
         
     headers['Authorization'] = TOKEN+token_text.get()
@@ -873,7 +882,9 @@ def clonedev():
     
     try:
         del fullpydict["mnmn"]
+        del fullpydict["manufacturerName"]
         del fullpydict["vid"]
+        del fullpydict["presentationId"]
         del fullpydict["version"]
         del fullpydict["migration"]
     except:
@@ -1213,7 +1224,7 @@ def showhelp():
     text = "\
     SmartThings Custom Capability Cloner\n\
     \n\
-    Copyright 2021 Todd A. Austin  Version 1.20210315\n\
+    Copyright 2021 Todd A. Austin  Version 1.20210411\n\
     \n\
     Problem:\n\
     - Sharing custom capabilities across accounts is not currently enabled for profile-based devices\n\
@@ -1335,7 +1346,7 @@ if __name__ == '__main__':
 
     # TKINTER INITIALIZATION STUFF
 
-    root.title("SmartThings Device Config Cloner")
+    root.title("SmartThings Device Config Replicator")
 
     c = ttk.Frame(root, padding="3 3 12 12")
     c.grid(column=0, row=0, sticky=(N, W, E, S))
@@ -1438,5 +1449,7 @@ if __name__ == '__main__':
     c.grid_rowconfigure(11, weight=1)
 
     readcfg()
+
+    print ("\nSmartThings Device Config Replicator starting in GUI\n")
 
     root.mainloop()
