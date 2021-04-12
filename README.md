@@ -105,14 +105,15 @@ The onboard script can be run again at a later time if needed and it will step t
 
 
 ### Additional scripts provided
-- startall - master startup script to load (1) zone device apps & panel (post initial onboarding), (2) DSCmanager, (3) alarmserver; this script is optional- you can configure loading anyway you like, e.g. auto-load at boot time through systemd, etc
+- startall - example startup script to load (1) DSCmanager & (already-onboarded) device apps, (2) alarmserver; this script is optional- you can configure loading anyway you like, e.g. auto-load at boot time through systemd, etc
 - buildloader - used by ASdevsetup; creates loaddevs script that is in turn used by DSCmanager to start up each device app (zones + panel)
-- loaddevs - invoked by DSCmanager to load all device apps at startup 
-- STdevsn - list serial numbers associated with each device app
+- loaddevs - invoked by DSCmanager to load all device apps at startup; can be modified for process loading preferences
+- loaddevs_xxx - alternative examples of loaddevs for enabling/disabling zone GUIs
+- STdevsn - list serial numbers associated with each device app; give an argument pointing to the stdevices directory path
 
 ## Full system startup
 
-Once all device apps have been initially onboarded and running, you can then start DSCmanager and then alarmserver to get everything operating.  I recommended initially running everything in a separate terminal window so you can monitor log messages.  Once everything is loading and running OK, you can switch to detached execution if desired.
+Once all device apps have been initially onboarded and running, you can then start DSCmanager and then alarmserver to make sure everything is working.  I recommended initially running each app in a separate terminal window so you can monitor log messages.  Once everything is loading and running OK, you can set up your configuration for detached execution if desired (through modification of loaddevs script).
 
 Required arguments for each application are as follows:
 ```
@@ -121,16 +122,18 @@ DSCpanel_1 -sock <UNIX named socket name> -zones <# of zones> -namespace <namesp
 DSCManager
 python3 alarmserver -c <alarmserver.cfg file path/name>
 ```
-For subsequent startup, you can modify and use the loaddevs script to load your device apps any way you wish (in background, in a terminal, with GUI, at boot time, etc.).  Some example loaddevs alternatives are provided for reference.  Recommended loading order for everything is 1) device apps, 2) DSCmanager, 3) alarmserver.  The 'startall' script can be used/modified to do this.
+For subsequent startup, you can modify and use the loaddevs script to load your device apps any way you wish (in background, in a terminal, with GUI, at boot time, etc.).  Some example loaddevs alternatives are provided for reference.  Recommended loading order for everything is 1) DSCmanager/device apps, 2) alarmserver.  The 'startall' script can be used/modified to do this.
+
+DSCmanager will examine the process table to see if the zone device apps are already running.  If not, it will invoke the loaddevs script and then ensure all expected device apps got loaded.  So you could alternatively load the zone+panel device apps yourself prior to running DSCmanager.  You can also terminate and restart any zone or panel device app without restarting DSCmanager - it will reconnect to the device app when it becomes available.  The same is true the other way around.  You can terminate and restart DSCmanager while leaving the device apps running (although no messages will be getting through until DSCmanager is restarted!).
 
 ## Using your DSC devices in the SmartThings Mobile App
 The first thing you will want to do after your devices are onboarded and happily humming away on your Pi is to go into the mobile app and group the DSC devices into a room, and rename each of them to something useful, e.g.  a combination of zone number (Z1) and abbreviated zone description - short enough to fit on the dashboard card.  
 
-The zone devices have no action buttons on the dashboard - just the status of the device (open/closed, motion/no motion, etc.).  On the details screen, you'll see a zone status field, which most of the time will show the open/close-type state of the device, but may also show other status such as alarm, trouble, etc.  Also on the details screen is a toggle button you can use to turn on and off bypass state for the zone.  See additional info below regarding alarms.
+The zone devices have no action buttons on the dashboard card - just the status of the device (open/closed, motion/no motion, etc.).  On the details screen, you'll see a zone status field, which most of the time will show the open/close-type state of the device, but may also show other status such as alarm, trouble, etc.  Also on the details screen is a toggle button you can use to turn on and off bypass state for the zone.  See additional info below regarding alarms.
 
 The panel device has a bit more function.  On the dashboard card, the button is used to arm or disarm the partition.  Whether it performs an arm-away or arm-stay is configured on the details screen (explained below).  The state shown on the dashboard is whatever the DSC is reporting such as ready, not ready, exit delay, armed-away or armed-stay, alarm, etc.  I have eliminated the force-ready status since it's not very useful and in the old alarmserver implementation always caused a crazy amount of constant state changes, filling up the log and messages everytime someone opened a door or walked by a motion sensor!
 
-The panel device dashboard card icon is supposed to be gray when in Ready state, and color highlighted for anything else.  Unfortunately there is bug in the IOS version of the mobile app (reported and confirmed) where this is not working correctly, so it is always color highlighted.
+The icon on the panel device dashboard card is supposed to be gray when in Ready state, and color highlighted for anything else.  Unfortunately there is bug in the IOS version of the mobile app (reported and confirmed) where this is not working correctly, so it is always color highlighted.
 
 The panel device detail screen has a number of features.  First is the partition status - same as what is shown on the dashboard.  Below that is an 'Indicators' field which will show additional status items such as Trouble, Memory, Bypass, and Fire.  Next are discrete buttons to arm-stay or arm-away (or disarm afterwards).  Then there is a button to bring up a list of additional (less-used) partition commands that can be invoked.  Finally there is a toggle button to configure what happens when you tap the button on the dashboard card.  It can be set to either type=arm-away or type=arm-stay, whichever you prefer.  Remember you can always go to the details screen to directly arm either way, no matter how the dashboard button is configured.  
 
@@ -167,6 +170,6 @@ Here are some tips to follow:
 - Be sure that you've given the Pi device app enough time to load and get in to a 'listen' state before you get too far in the mobile app Add Device process
 - In the event that onboarding a device fails, if you wait long enough (up to 4 minutes max), the Pi device app will usually time out and return your Pi's wireless state back to normal.  If you Ctrl-c out of the Pi device app early, your wireless may be left in the 'SoftAP' state.  If this happens, use the ~/rpi-st-device/resetAP utility to reset your wireless state before restarting the device app again (the onboard script offers the option to do this for you)
 - Monitor the log messages coming from the device app; they can help determine where errors may be occurring.  Copy and paste them to a file to provide later if asking for help.
-- Once the mobile app is done exchanging info with your Pi and you've selected a wireless AP for the Pi to reconnect to (moot if you have an ethernet connection), the Pi device app will then wait for the SmartThings MQTT server to respond back with successful device registration.  At times, this can take up to 30-40 seconds or more from the time you had selected an AP in the mobile app, so be patient.
+- Once the mobile app is done exchanging info with your Pi and you've selected a wireless AP for the Pi to reconnect to (moot if you have an ethernet connection), the Pi device app will then wait for the SmartThings MQTT server to respond back with successful device registration.  At times, this can take up to 30-40 seconds or more from the time you had selected an SSID in the mobile app, so be patient.
 
-See the detail configuration guide of the rpi-st-device package for additional information.
+See the detail configuration guide in the rpi-st-device package for additional information.
