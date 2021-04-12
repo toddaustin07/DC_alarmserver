@@ -1,0 +1,141 @@
+#!/bin/bash
+
+#################################################################################
+#           Setup of DSC Devices for SmartThings / Alarmserver
+#                           Build loader script
+#                           Version 1.20210412
+#
+# Copyright 2021 Todd A. Austin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.                        
+#
+##################################################################################
+
+devmapfile="./devmap"
+loadfile="./loaddevs"
+onblist="./onboard.lst"
+
+if [ ! -f "$devmapfile" ]; then
+	echo -e "\ndevmap file not found in current directory"
+	exit -1
+fi
+
+# Read devmap file
+
+errcode=0
+result=$(cat $devmapfile)
+ 
+readarray -t line_array <<< $result
+lineindex=0;
+savIFS=$IFS
+IFS="="
+len="${#line_array[@]}"
+
+if [ $len -lt 13 ]; then
+	echo "devmap appears to be incomplete; cannot continue"
+	exit -1
+fi
+
+cwd=$(pwd)
+
+# Obtain namespace id from user
+
+fflag=0
+while [ $fflag -ne 1 ]; do
+	echo -en "\n\t\e[96mProvide your SmartThings-assigned namespace: \e[0m"
+	read namesp
+
+	if [ "$namesp" != "" ]; then
+		if [ "${#namesp}" == 15 ]; then
+			if [[ "$namesp" =~ ^[0-9a-zA-Z]+$ ]]; then
+				fflag=1
+			else
+				echo -e "\t\e[91mMust only have letters/numbers\e[0m"
+			fi
+		else
+			echo -e "\t\e[91mMust be combination of 15 letters/numbers\e[0m"
+		fi
+	else
+		echo -e "\t\e[91mNamespace is required; try again\e[0m"
+	fi
+done
+echo
+
+if [ "$namesp" == "" ]; then
+	echo -e "No namespace provided; cannot continue\n"
+	exit -1
+fi
+
+# Initialize loaddevs file content
+
+echo '#!/bin/bash' > $loadfile
+echo 'cwd=$(pwd)' >> $loadfile
+echo 'echo -e "\nCurrent working directory: >$cwd<"' >> $loadfile
+echo 'echo -e "\nLoading DSC Zone and Panel Device Apps\n"' >> $loadfile
+echo '#' >> $loadfile
+
+if [ -f "$onblist" ]; then
+	rm $onblist
+fi
+
+# Process zone elements in devmap
+
+numzones=0
+
+while [ $lineindex -lt $len ]; do
+
+	item=${line_array[lineindex]}
+
+	if [[ "$item" == "zone" || "$item" == "partition" ]]; then
+
+		lineindex=$((lineindex+1))
+		znum=${line_array[lineindex]}
+		lineindex=$((lineindex+1))
+		ztype=${line_array[lineindex]}
+		lineindex=$((lineindex+2))
+		zsock=${line_array[lineindex]}
+		lineindex=$((lineindex+1))
+		zpath=${line_array[lineindex]}
+		
+		if [ "$item" == "zone" ]; then
+			echo 'cd $cwd/'$zpath >> $loadfile
+			echo '(./DSCzone_'"$znum"' -sock '"$zsock"' -type '"$ztype"' -namespace '"$namesp"' &> logfile &)' >> $loadfile
+			echo 'sleep 1' >> $loadfile
+			
+			echo 'lxterminal --command="'"$cwd"'/'"$zpath"'/DSCzone_'"$znum"' -sock '"$zsock"' -type '"$ztype"' -namespace '"$namesp"'" --working-directory='"$cwd"'/'"$zpath"' --title="DSC Zone '"$znum"'"' >> $onblist
+			
+			numzones=$((numzones+1))
+		else
+			pandevnum=$((numzones+1))
+			echo 'cd $cwd/'$zpath >> $loadfile
+			echo 'lxterminal --command="$cwd/'"$zpath"'/DSCpanel_1 -sock '"$zsock"' -zones '"$numzones"' -namespace '"$namesp"'" --working-directory="$cwd"/'"$zpath"' --title="DSC Panel"' >> $loadfile
+			echo 'sleep 1' >> $loadfile
+			
+			echo 'lxterminal --command="'"$cwd"'/'"$zpath"'/DSCpanel_1 -sock USOCK'"$pandevnum"' -zones '"$numzones"' -namespace '"$namesp"'" --working-directory='"$cwd"'/'"$zpath"' --title="DSC Panel"' >> $onblist
+			
+		fi
+
+	else
+		echo -e "Unexpected devmap content; cannot continue"
+		exit -1
+	fi
+	
+	lineindex=$((lineindex+2))
+	
+done
+
+chmod +x $loadfile
+
+exit 0
+
+	

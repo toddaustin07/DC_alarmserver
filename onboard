@@ -1,0 +1,470 @@
+#!/bin/bash
+
+#################################################################################
+#           Setup of DSC Devices for SmartThings / Alarmserver
+#                      Device Onboarding Helper script
+#                         Version 1.20210228
+#
+# Copyright 2021 Todd A. Austin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.                        
+#
+##################################################################################
+
+reldevpath="stdevices/"
+mapfile="./devmap"
+onblist="./onboard.lst"
+devinfojson="device_info.json"
+onbconfigjson="onboarding_config.json"
+sdkpkgdir="$HOME/st-device-sdk-c"
+qrfname=""
+
+
+# Subroutine to create QR codes
+
+createqr() {
+
+  local retcode=1
+  
+  savedir=$(pwd)
+        
+  cd "$sdkpkgdir/tools/qrgen"
+              
+  qroutput=$(python3 stdk-qrgen.py --folder "$savedir")
+  errnum=$?
+              
+  if [ $errnum == 0 ]; then
+    savIFS=$IFS
+    IFS=":"
+    read -a outarr <<< ${qroutput[0]}
+    IFS=$savIFS
+              
+    if [ "${outarr[0]}" == "File" ]; then
+      qrfname="${outarr[1]}"
+      qrfname=${qrfname//[[:space:]]/}
+                
+      if [ -f "$sdkpkgdir/tools/qrgen/$qrfname" ]; then
+                
+        cp "$sdkpkgdir/tools/qrgen/$qrfname" "$savedir/$qrfname"
+        if [ -f "$savedir/$qrfname" ]; then
+			retcode=0
+        fi          
+      else
+        echo -e "\e[91m$qrfname not found\e[0m"
+      fi            
+    else
+      echo -e "\e[91mQR code creation failed:\n\e[0m$qroutput"
+    fi
+  else
+    echo -e "\e[91mCan't run QRgen tool; error #$errnum\e[0m"
+  fi
+  
+  cd $savedir
+  return $retcode
+
+}
+
+##############################################################################
+#							MAIN
+##############################################################################
+
+currentdir=$(pwd)
+
+echo -e "\n\e[97mOnboarding helper for your alarmserver device apps\e[0m\n"
+
+if [ ! -f "$mapfile" ]; then
+	echo -e "\e[31m$mapfile is missing from current directory; cannot continue\e[0m\n"
+	exit -1
+fi
+
+#echo -e "Using $mapfile"
+
+if [ ! -d "$reldevpath" ]; then
+	echo -e "\e[31m$reldevpath directory is missing; cannot continue\e[0m\n"
+	exit -1
+fi
+
+errcode=0
+dirlist=$(ls $reldevpath)
+ 
+readarray -t line_array <<< $dirlist
+lineindex=0
+savIFS=$IFS
+IFS=" "
+
+len="${#line_array[@]}"
+
+echo -e "\e[0mVerifying dependencies in path:\n\t $currentdir/$reldevpath\e[0m"
+
+echo
+
+cd $reldevpath
+
+errors=0
+i=0
+
+while [ $lineindex -lt $len ]; do
+
+	devdir=${line_array[lineindex]}
+	
+	cd $devdir
+	
+	# See if device is already onboarded
+	
+	onboarded[$i]=0
+	
+	wifistat=$(cat WifiProvStatus 2>/dev/null)
+	
+	if [ "$wifistat" == "DONE" ]; then
+
+		cloudstat=$(cat CloudProvStatus 2>/dev/null)
+		
+		if [ "$cloudstat" == "DONE" ]; then
+		
+			devid=$(cat DeviceID 2>/dev/null)
+			
+			if [ ${#devid} == 36 ]; then
+			
+				onboarded[$i]=1
+			fi
+		fi
+	fi
+	
+	# If not already onboarded, check all dependencies
+	
+	if [ ${onboarded[i]} -eq 0 ]; then
+	
+		if [ ! -f "$devinfojson" ]; then
+			echo -e "\t\e[93m$devdir: \e[91m$devinfojson is missing\e[0m"
+			errors=$((errors+1))
+		fi
+	   
+		if [ ! -f "$onbconfigjson" ]; then
+			echo -e "\t\e[93m$devdir: \e[91m$onbconfigjson is missing\e[0m"
+			errors=$((errors+1))
+		fi
+		
+		# Check for QR code and create if needed
+		
+		qrfile=$(compgen -G "STDK*.png")
+			
+		if [[ ! "$qrfile" == "STDK"* ]]; then
+		
+			if [ $errors -eq 0 ]; then		# do only if json files aren't missing
+		
+				echo -en "\t\e[93m$devdir: "
+				createqr
+				
+				if [ $? -eq 0 ]; then
+					echo -e "\e[32mQR code created: $qrfname\e[0m"
+					qrcode[$i]=$reldevpath$devdir'/'$qrfname
+				else
+					errors=$((errors+1))
+				fi
+			else
+				echo -e "\t\e[93m$devdir: \e[91mQRcode file is missing\e[0m"
+				errors=$((errors+1))
+			fi
+		else
+			qrcode[$i]=$reldevpath$devdir'/'$qrfile
+		fi
+		
+		devexec=$(compgen -G "DSC*")
+		
+		if [[ "$devexec" != "DSCzone"* ]]; then
+			if [[ "$devexec" != "DSCpanel"* ]]; then
+		
+				echo -e "\t\e[93m$devdir: \e[91mdevice app is missing\e[0m"
+				errors=$((errors+1))
+			fi
+		fi
+		
+	fi
+		
+		lineindex=$((lineindex+1))
+		i=$((i+1))
+		cd '..'
+		
+done
+
+IFS=$savIFS
+
+cd '..'
+
+
+###########
+#TEST PATCH
+#errors=0
+###########
+
+if [ $errors -gt 0 ]; then
+	echo -e "\n\e[31m$errors dependency errors found; not ready to onboard\e[0m\n"
+	exit -1
+fi
+
+echo -e "\n\e[97mAll dependencies confirmed; starting onboarding...\e[0m"
+echo
+
+if [ ! -f "$onblist" ]; then
+	echo -e "\n\e[31m$onblist file is missing; cannot continue\e[0m\n"
+	exit -1
+fi
+
+# Get list of devices to load from onboard.lst
+
+startlist=$(cat $onblist)
+readarray -t load_array <<< $startlist
+count="${#load_array[@]}" 
+
+if [ $count -ne $len ]; then
+	echo "\e[91mSomething went wrong; onboarding list differs from device directories\e[0m"
+	exit -1
+fi
+
+keyinput=""
+
+while [ "$keyinput" != 'q' ]; do
+	
+	# Display list of device apps
+	
+	echo -e "============================================================================"
+	echo -e "\e[97m"
+	echo -e "\tDEVICE      Type        Onboard Status   Running?\e[0m"
+	echo -e "\t----------  ---------   --------------   ------------\e[94m"
+
+	index=0
+
+	while [ $index -lt $count ]; do
+
+		devnum=$(($index+1))
+		
+		echo ${load_array[index]} > runcmd.sh
+		fullpath=$(cat runcmd.sh | cut -d '"' -f2 | cut -d ' ' -f1)
+		savIFS=$IFS
+		IFS="/"
+		read -a path_array <<< $fullpath
+		IFS=$savIFS
+		numelements="${#path_array[@]}"
+		pi=numelements-1
+		devname="${path_array[$pi]}"
+		
+		if [[ "$devname" == "DSCzone"* ]]; then
+			result=$(cat runcmd.sh | cut -d ' ' -f6)
+			devtype="\e[0m${result//\"}"
+		else
+			if [[ "$devname" == "DSCpanel"* ]]; then
+				devtype="\e[0mpanel"
+			else
+				echo -e "\e[91mError: unknown device type in onboard.lst\e[0m"
+				exit -1
+			fi
+		fi
+
+		# Refresh onboarding status
+
+		wifistat=$(cat stdevices/device"$devnum"/WifiProvStatus 2>/dev/null)
+	
+		if [ "$wifistat" == "DONE" ]; then
+
+			cloudstat=$(cat stdevices/device"$devnum"/CloudProvStatus 2>/dev/null)
+			
+			if [ "$cloudstat" == "DONE" ]; then
+			
+				devid=$(cat stdevices/device"$devnum"/DeviceID 2>/dev/null)
+				
+				if [ ${#devid} == 36 ]; then
+					
+					onboarded[$index]=1
+				fi
+			fi
+		fi
+		
+		runstat="\e[0mNot running"
+		
+		if [ ${onboarded[$index]} -eq 0 ]; then
+			loadstat="\e[91mNot onboarded"
+		else
+			loadstat="\e[92mOnboarded"
+			
+			# See if onboarded device is already running by looking for its PID
+			
+			result=$(ps -C "$devname" --no-headers)
+			read -a ps_array <<< $result
+			pid=${ps_array[0]}
+			
+			if [ "$pid" != "" ]; then
+				if [[ "$pid" =~ ^[0-9]+$ ]]; then
+					if [ $pid -gt 0 ]; then
+						runstat="\e[92mRunning"
+					fi
+				fi
+			fi
+		fi
+		
+		# Allow user to only select devices that are not onboarded or onboarded but not running
+		
+		if [[ "$loadstat" == "\e[92mOnboarded" && "$runstat" == "\e[92mRunning" ]]; then
+			devnum=" "
+			availdev[$index]=0
+		else
+			availdev[$index]=1
+		fi
+		
+		
+		echo -en "\e[97m"
+		printf "  %-3b   %-10b  %-12b    %-18b    %-11b\n" "$devnum" "$devname" "$devtype" "$loadstat" "$runstat"
+		
+		index=$(($index+1))
+	done
+	
+	echo
+	
+	inputok=0
+	
+	for x in ${availdev[@]}; do
+		n=$(($n+$x))
+	done
+	
+	# Get device selection from user
+	
+	while [ $inputok -eq 0 ]; do
+	
+		if [ $n -gt 0 ]; then
+			echo -en "\e[96mEnter device number or q to quit: \e[0m"
+			read keyinput
+		else
+			keyinput='q'
+		fi
+		
+		if [ "$keyinput" == 'q' ]; then
+			echo
+			inputok=1
+		else
+			if [[ "$keyinput" =~ ^[0-9]+$ ]]; then
+				if [[ $keyinput -gt 0 && $keyinput -le $count ]]; then 
+					ix=$(($keyinput-1))
+					if [ ${availdev[$ix]} -eq 1 ]; then
+						inputok=1
+					fi
+				fi
+			fi
+			if [ $inputok -eq 0 ]; then
+				echo -e "\e[91mInvalid input; try again\e[0m"
+			fi
+		fi
+	done
+	
+	if [ "$keyinput" != 'q' ]; then
+	
+		# ONBOARDING PROCESS START
+	
+		echo
+		
+		index=$(($keyinput-1))
+
+		if [ ${onboarded[$index]} -eq 0 ]; then
+			retry=1
+			# Onboard the Device
+			while [ $retry == 1 ]; do
+				echo -e "\e[96mACTION >> Go to SmartThings mobile app 'Add device' and tap 'Scan QR code' at bottom of screen\e[0m" 
+				
+				gpicview ${qrcode[index]} &
+				
+				echo -e "\n\e[96mACTION >> Point camera at the QRCODE\e[0m"
+				
+				echo -e "\n\t\e[97mStarting Pi device app in separate terminal window...\e[0m"
+				echo -e "\t\t- Ensure no errors are displayed in new terminal window before proceeding in mobile app"
+				
+				echo -e "\n\e[96mACTION >> Follow prompts in mobile app"
+				
+				echo ${load_array[index]} > runcmd.sh
+				chmod +x runcmd.sh
+				./runcmd.sh
+				
+				keyinput2=""
+				echo -en "\n\e[33mWas the device successfully registered in the SmartThings mobile app? (\e[93my\e[33m/\e[93mn\e[33m) > \e[0m"
+				
+				while [[ "$keyinput2" != 'y' && "$keyinput2" != 'n' ]]; do
+					read keyinput2
+				done
+				
+				if [ "$keyinput2" == 'n' ]; then
+				
+					echo -e "\t> Exit and restart the SmartThings mobile app"
+					echo -e "\t> Wait for the Pi device app to time out (could take a minute or more), then Ctrl-c to terminate"
+					echo -e "\t> After Pi device app termination, up/down arrows in upper right desktop title bar indicate wifi still in SoftAP mode"
+					echo -en "\n\e[33mDoes the Pi wifi need resetting back to station mode? (\e[93my\e[33m/\e[93mn\e[33m) > \e[0m"
+					
+					keyinput2=""
+					while [[ "$keyinput2" != 'y' && "$keyinput2" != 'n' ]]; do
+						read keyinput2
+					done
+					echo
+					
+					if [ "$keyinput2" == 'y' ]; then
+						~/rpi-st-device/resetAP
+					fi
+					
+					echo -en "\e[33mDo you want to retry onboarding this device? (\e[93my\e[33m/\e[93mn\e[33m) > \e[0m"
+					
+					keyinput2=""
+					while [[ "$keyinput2" != 'y' && "$keyinput2" != 'n' ]]; do
+						read keyinput2
+					done
+					echo	
+					
+					if [ "$keyinput2" == 'n' ]; then 
+						retry=0
+					else	
+						echo -e "\n\e[97mDEVICE $devnum RETRY:"
+						echo -e "---------------"
+						
+					fi
+				else
+					retry=0;
+				fi
+				
+				pid=$(pidof gpicview)
+				kill $pid
+			done
+				
+		else
+			echo -e "\n\e[0mDevice application already onboarded"
+			echo -en "\n\t\e[33mDo you still want to load it now? (\e[93my\e[33m/\e[93mn\e[33m) > \e[0m"
+			keyinput2=""
+			while [[ "$keyinput2" != 'y' && "$keyinput2" != 'n' ]]; do
+				read keyinput2
+			done
+			echo	
+			
+			if [ "$keyinput2" == 'y' ]; then
+				echo ${load_array[index]} > runcmd.sh
+				chmod +x runcmd.sh
+				./runcmd.sh
+				echo -e "\tDevice app loaded"
+			fi
+			
+		fi
+		
+		echo
+		echo
+	fi
+done
+
+# CLEAN UP AND EXIT
+
+if [ -f runcmd.sh ]; then
+	rm runcmd.sh
+fi
+
+echo -e "\e[0mGoodbye\n"

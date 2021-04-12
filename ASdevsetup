@@ -1,0 +1,364 @@
+#!/bin/bash
+
+#################################################################################
+#           Setup of DSC Devices for SmartThings / Alarmserver
+#                      Device setup bash script
+#                         Version 1.20210412
+#
+# Copyright 2021 Todd A. Austin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.                        
+#
+##################################################################################
+
+devfirmware="DSC_001"
+alarmserverconfig="alarmserver.cfg"
+reldevpath="stdevices/"
+mapfile="./devmap"
+sdkpkgdir="$HOME/st-device-sdk-c"
+tmpserialfile="/.ser"
+serialfile="/serialnums"
+
+zoneDeviceApp="DSCzone"
+panelDeviceApp="DSCpanel"
+
+declare -a zonetype
+declare -a zonenum
+declare -a devdir
+
+##########################################################################
+#
+#								- MAIN -
+#
+##########################################################################
+
+# Save directory we're running from
+
+currentdir=$(pwd)
+
+# Get location of alarmserver.cfg file
+
+fflag=0
+
+if [ ! -f "$alarmserverconfig" ]; then
+	while [ $fflag -ne 1 ]; do
+		echo -en "\n\e[97mEnter full pathname of $alarmserverconfig: \e[0m"
+		read alarmserverpath
+	
+		if [ -f "$alarmserverpath" ]; then
+			fflag=1;
+		else
+			echo -e "\e[91mNot found - try again\e[0m"
+		fi
+	done
+else
+	alarmserverpath=$alarmserverconfig
+fi
+
+echo -en "\nUsing: $alarmserverpath\n"
+
+# Create devices directory
+
+mkdir $reldevpath 2>/dev/null
+
+# Backup existing devmap file
+
+if [ -f "$devmap" ]; then
+	cp $devmap "$devmap_backup"
+fi
+rm $mapfile 2>/dev/null
+
+# Read alarmserver config file for configured zones
+
+errcode=0
+result=$(cat $alarmserverpath)
+ 
+readarray -t line_array <<< $result
+lineindex=0;
+savIFS=$IFS
+IFS="="
+len="${#line_array[@]}"
+
+echo -e "\n\e[97mDSC devices configured:\e[0m"
+echo -e "Partition 1"
+
+i=0
+
+while [ $lineindex -lt $len ]; do
+
+	line=${line_array[lineindex]}
+   
+	if [[ "$line" == [zone* ]]; then
+		
+		zonenum[i]="${line//[!0-9]/}"
+		
+		lineindex=$((lineindex+1))
+		
+		line=${line_array[lineindex]}
+			
+		read -a lineparts <<< $line
+			
+		if [ ${lineparts[0]} == "name" ]; then
+			zonename[i]=${lineparts[1]}
+		else 
+			if [ ${lineparts[0]} == "type" ]; then
+				zonetype[i]=${lineparts[1]}
+			fi
+		fi
+		
+		lineindex=$((lineindex+1))	
+		
+		line=${line_array[lineindex]}
+			
+		read -a lineparts <<< $line
+			
+		if [ ${lineparts[0]} == "name" ]; then
+			zonename[i]=${lineparts[1]}
+		else 
+			if [ ${lineparts[0]} == "type" ]; then
+				zonetype[i]=${lineparts[1]}
+			fi
+		fi
+	
+		echo -e "\tZone #${zonenum[i]}, type=${zonetype[i]}, name=${zonename[i]}"
+		
+		echo "zone" >> $mapfile
+		echo "${zonenum[i]}" >> $mapfile
+		echo "${zonetype[i]}" >> $mapfile
+		echo "${zonename[i]}" >> $mapfile
+		echo "USOCK""${zonenum[i]}" >> $mapfile
+		devdir[i]="$reldevpath""device""${zonenum[i]}"
+		echo "${devdir[i]}" >> $mapfile
+		echo "#" >> $mapfile
+		
+		mkdir "${devdir[i]}" 2>/dev/null
+		
+		# Load the device directory with the zone device app
+		
+		cp $zoneDeviceApp "${devdir[i]}""/$zoneDeviceApp""_${zonenum[i]}"
+		
+		i=$((i+1))
+	else
+		lineindex=$((lineindex+1))
+	fi
+done
+
+IFS=$savIFS
+
+zonenum[i]=$((i+1))
+
+# Tack on the panel device to the list (assume 1 partition for now)
+
+echo "partition" >> $mapfile
+echo "1" >> $mapfile
+zonetype[i]="panel"
+echo "${zonetype[i]}" >> $mapfile
+zonename[i]="Home"
+echo "${zonename[i]}" >> $mapfile
+echo "USOCK"${zonenum[i]} >> $mapfile
+devdir[i]="$reldevpath""device""${zonenum[i]}"
+echo "${devdir[i]}" >> $mapfile
+mkdir "${devdir[i]}" 2>/dev/null
+
+echo -e "\n\tDSC Panel, type=${zonetype[i]}, name=${zonename[i]}"
+
+cp $panelDeviceApp "${devdir[i]}""/$panelDeviceApp""_1"
+
+echo -e "\n\e[97mDevice subdirectories initialized\n"
+echo -e "Device map file created\n\e[0m"
+
+#cat $mapfile
+
+numdevices=$((i+1))
+
+# Generate SmartThings device serial numbers & keys (device_info.json)
+
+if [ ! -f "$sdkpkgdir""/tools/keygen/stdk-keygen.py" ]; then
+	echo -e "\e[91mKeygen tool missing; cannot continue\n\e[0m"
+	echo "$sdkpkgdir""/tools/keygen/stdk-keygen.py"
+	exit -1
+fi
+
+echo -e "\e[97mGenerating device serial numbers...\e[0m"
+
+fflag=0
+while [ $fflag -ne 1 ]; do
+	echo -e "\n\t\e[96mProvide your SmartThings 4-character MNID if you know it,"
+	echo -en "\tor just press enter if you don't: \e[0m"
+	read mnid
+
+	if [ "$mnid" != "" ]; then
+		if [ "${#mnid}" == 4 ]; then
+			if [[ "$mnid" =~ ^[0-9a-zA-Z]+$ ]]; then
+				fflag=1
+			else
+				echo -e "\t\e[91mMust only have letters/numbers\e[0m"
+			fi
+		else
+			echo -e "\t\e[91mMust be combination of 4 letters/numbers\e[0m"
+		fi
+	else
+		fflag=1
+	fi
+done
+echo
+
+i=0
+noerror=1
+tmpserfilepath="$currentdir""$tmpserialfile"
+serfilepath="$currentdir""$serialfile"
+
+if [ -f "$tmpserfilepath" ]; then
+	rm "$tmpserfilepath"
+fi
+
+touch "$tmpserfilepath"
+
+cd "$sdkpkgdir/tools/keygen"
+
+while [[ $i -lt $numdevices && noerror -eq 1 ]]; do
+
+	if [ -f "$currentdir/""${devdir[i]}/device_info.json" ]; then
+		cmd_p1="grep -n "
+		cmd_p2="-e \"serialNumber\""
+		cmd_p3="cut -d : -f3"
+		buildcmd="$cmd_p1""$currentdir/""${devdir[i]}/device_info.json ""$cmd_p2"
+		output=$($buildcmd | $cmd_p3)
+		_serialnum="${output//\"}"
+		serialnum="${_serialnum// }"
+		
+		cmd_p2="-e \"publicKey\""
+		buildcmd="$cmd_p1""$currentdir/""${devdir[i]}/device_info.json ""$cmd_p2"
+		output=$($buildcmd | $cmd_p3)
+		_publickey1="${output//\"}"
+		_publickey2="${_publickey1// }"
+		publickey="${_publickey2//,}"
+		
+		echo -e "Serial number already exists for ${zonetype[i]} device ${zonenum[i]}: $serialnum"
+		echo -e "${zonetype[i]}\t $serialnum  $publickey   (Device ${zonenum[i]})" >> $tmpserfilepath
+		
+	else
+		echo -en "Creating ${zonetype[i]} ${zonenum[i]} serial number: "
+		
+		x=0
+		
+		if [ "$mnid" == "" ]; then 
+			output=$(python3 stdk-keygen.py --firmware "$devfirmware")
+		else
+			output=$(python3 stdk-keygen.py --mnid "$mnid" --firmware "$devfirmware")
+		fi
+		errnum=$?
+		
+		if [ $errnum -eq 0 ]; then
+		
+			while read -r line; do
+				cmdoutput[x]="$line"
+				x=$((x+1))
+			done <<< "$output"
+	
+			x=0
+			while [ "${cmdoutput[$x]}" != "Serial Number:" ]; do x=$((x+1)); done
+			x=$((x+1))
+			serialnum="${cmdoutput[x]}"
+			sndir="output_$serialnum"
+			echo -e "$serialnum"
+		
+			if [ -f "$sdkpkgdir/tools/keygen/$sndir/device_info.json" ]; then
+		
+				cp "$sdkpkgdir/tools/keygen/$sndir/device_info.json" "$currentdir""/${devdir[i]}/device_info.json"
+				
+				cmd_p1="grep -n "
+				cmd_p2="-e \"publicKey\""
+				cmd_p3="cut -d : -f3"
+				buildcmd="$cmd_p1""$currentdir/""${devdir[i]}/device_info.json ""$cmd_p2"
+				output=$($buildcmd | $cmd_p3)
+				_publickey1="${output//\"}"
+				_publickey2="${_publickey1// }"
+				publickey="${_publickey2//,}"
+
+				echo -e "${zonetype[i]}\t $serialnum  $publickey   (Device ${zonenum[i]})" >> $tmpserfilepath
+		
+			else
+				echo -e "\e[91mERROR: keygen-generated device_info.json not found\n\e[0m"
+				noerror=0
+			fi
+		else
+			 echo -e "\e[91mERROR: keygen tool failed with error #$errnum\n\e[0m"
+			 noerror=0
+		fi
+	
+	fi
+	i=$((i+1))
+	
+done
+
+# Sort and write out serialnumber file
+if [ -f "$serfilepath" ]; then
+	rm "$serfilepath"
+fi
+
+if [ -f "$tmpserfilepath" ]; then
+	sort --key=1.1,1.7 --key=4.9 --output=tmpser $tmpserfilepath
+	rm "$tmpserfilepath"
+fi
+echo -e "TYPE   \t SERIAL NUMBER     PUBLIC KEY" > $serfilepath
+echo -e "=======\t ================  ============================================" >> $serfilepath
+cat tmpser >> $serfilepath
+rm tmpser
+
+mousepad $serfilepath &>/dev/null &
+
+cd $currentdir
+
+echo -e "\n\e[97mCreating device loading script...\e[0m"
+./buildloader
+
+errnum=$?
+if [ $errnum -ne 0 ]; then
+	echo -e "Terminating\n"
+	exit -1
+fi
+
+echo -en "\n\e[96mOK to modify alarmserver.cfg now? (\e[97my\e[96m/\e[97mn\e[96m): \e[0m"
+keyin=""
+while [[ "$keyin" != "y" && "$keyin" != "n" ]]
+do
+ read -rsn1 keyin
+done
+echo $keyin
+
+if [ "$keyin" == "n" ]; then
+	echo -e "\n\nDONE\n"
+	exit
+fi
+
+echo 
+
+origfile=$alarmserverpath"_ORIG"
+backfile=$alarmserverpath"_BACKUP"
+if [ -f "$origfile" ]; then
+	cp $alarmserverpath $backfile
+else
+	cp $alarmserverpath $origfile
+fi
+
+sed -i "/^callbackurl_base=/c\\callbackurl_base=http://localhost:9980" "$alarmserverpath"
+sed -i "/^callbackurl_app_id=/c\\callbackurl_app_id=rpi" "$alarmserverpath"
+sed -i "/^callbackurl_access_token=/c\\callbackurl_access_token=" "$alarmserverpath"
+
+echo "alarmserver.cfg updated for direct-connected devices"
+echo
+echo "DONE"
+echo
+
+exit 0

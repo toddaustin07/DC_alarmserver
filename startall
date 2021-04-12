@@ -1,0 +1,13 @@
+#!/bin/bash
+cwd=$(pwd)
+echo "Starting device manager"
+./DSCmanager
+if [ $? -ne 0 ]; then exit -1; fi
+pid=$(ps -f -a | grep "alarmserver.py" | grep -v 'grep' | tr -s ' ' | cut -f2 -d' ')
+num='^[0-9]+$'
+if [[ $pid =~ $num ]]; then
+	echo "Alarmserver already running (pid=$pid)"
+else
+	echo "Starting alarmserver in separate terminal"
+	lxterminal --command="python3 alarmserver.py -c ./alarmserver.cfg" --working-directory="$cwd" --title="Alarmserver"
+fi
